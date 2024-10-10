@@ -26,22 +26,8 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+
     public function store(Request $request) {
-        $formFields = $request->validate([
-            'name' => ['required', 'min:3'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'password' => 'required|confirmed|min:6'
-        ]);
-
-        // Hash the password
-        $formFields['password'] = bcrypt($formFields['password']);
-
-        // Create the user
-        $user = User::create($formFields); 
-
-        return response()->json($user);
-    }
-    /*public function store(Request $request) {
         $formFields = $request->validate([
             'name' => ['required', 'min:3'],
             'email' => ['required', 'email'],
@@ -52,12 +38,10 @@ class UserController extends Controller
 
         $user = User::create($formFields); 
 
-       // return response()->json($user);
+        return response()->json($user);
 
-        return redirect('/')->with('message', 'User created and logged in');
-
-     //  return response()->json("User Created Successfully");
-    }*/
+       //return response()->json("User Created Successfully");
+    }
 
     /**
      * Display the specified user.
@@ -80,11 +64,10 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validate the request data
-      /*  $validatedData = $request->validate([
+        $validatedData = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|unique:users,email,' . $id,
-            'password' => 'sometimes|required|string|min:8|confirmed', // Requires password confirmation if password is updated
+            'password' => 'sometimes|required|string|min:8|confirmed',
         ]);
 
         // Find the user
@@ -98,12 +81,10 @@ class UserController extends Controller
         // Update user attributes
         $user->update(array_filter($validatedData)); // Only update non-empty fields
 
-        */
-    //    return response()->json($user);
+        return response()->json($user);
 
-        return response()->json("User Updated Successfully");
+        //return response()->json("User Updated Successfully");
     }
-
     /**
      * Remove the specified user from storage.
      *
@@ -112,10 +93,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-      //  $user = User::findOrFail($id); 
-      //  $user->delete(); 
+        $user = User::findOrFail($id); 
+        $user->delete(); 
         return response()->json(['message' => 'User deleted successfully']);
     }
 }
 
 
+// newpassword123

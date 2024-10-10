@@ -24,25 +24,29 @@ Route::get('/passengers', [PassengerController::class, 'index']);
 // Route for flights
 Route::get('/flights', [FlightController::class, 'index']); // This will list all flights
 
+// get passenger by flight id
 Route::get('/flights/{flight}/passengers', [FlightController::class, 'passengers']);
 
 // CRUD for users
 Route::get('/users', [UserController::class, 'index']);     // Get all users
 Route::get('/users/{id}', [UserController::class, 'show']);  // Get a single user
 
-Route::post('/users', [UserController::class, 'store']);    // Create a new user
-Route::put('/users/{id}', [UserController::class, 'update']); // Update user
-Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete user
+// CRUD for users for Admins
+Route::middleware('auth:sanctum', 'admin')->group(function () {
+    Route::post('/users', [UserController::class, 'store']); // create user
+    Route::put('/users/{id}', [UserController::class, 'update']); // Update user
+    Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete user
+});
 
 // Authentication routes
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
-Route::post('/register', [AuthController::class, 'register']);
+// Route::post('/logout', [AuthController::class, 'logout']);
 
-
-Route::get('/users/create', function () {
-    return view('create_user');
+// Authentication routes (only for authenticated users)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
+
 
 Route::get('/', function () {
     return view('welcome');
