@@ -40,7 +40,6 @@ Route::middleware('auth:sanctum', 'admin')->group(function () {
 
 // Authentication routes
 Route::post('/login', [AuthController::class, 'login']);
-// Route::post('/logout', [AuthController::class, 'logout']);
 
 // Authentication routes (only for authenticated users)
 Route::middleware('auth:sanctum')->group(function () {
