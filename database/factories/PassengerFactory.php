@@ -14,6 +14,7 @@ class PassengerFactory extends Factory
     public function definition(): array
     {
         return [
+            'flight_id' => Flight::factory(), // Create a new flight and use its ID
             'first_name' => $this->faker->firstName,  // Generates random first name
             'last_name' => $this->faker->lastName,    // Generates random last name
             'email' => $this->faker->unique()->safeEmail,  // Generates unique safe email
