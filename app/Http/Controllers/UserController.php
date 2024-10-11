@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User; 
-use App\Http\Requests\StoreUserRequest; // Import the StoreUserRequest
-use App\Http\Requests\UpdateUserRequest; // Import the UpdateUserRequest
+use App\Models\User;
+use App\Http\Requests\StoreUserRequest; 
+use App\Http\Requests\UpdateUserRequest; 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -31,12 +32,14 @@ class UserController extends Controller
     {
         // Validation is already handled in StoreUserRequest
 
-        // Create the user with hashed password
+        // Create the user with hashed password and set additional fields
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-        ]); 
+            'email_verified_at' => now(), // Set to now for new users
+            'remember_token' => Str::random(10), // Generate a token for new users
+        ]);
 
         return response()->json($user, 201); // Return 201 Created status
     }
@@ -72,8 +75,11 @@ class UserController extends Controller
             $request->merge(['password' => Hash::make($request->password)]);
         }
 
-        // Update user attributes
-        $user->update($request->only('name', 'email', 'password')); // Only update specified fields
+        // Update user attributes, including email_verified_at and remember_token
+        $user->update($request->only('name', 'email', 'password') + [
+            'email_verified_at' => $request->email_verified_at ?? now(), // Set to now if not provided
+            'remember_token' => $request->remember_token ?? Str::random(10), // Generate token if not provided
+        ]);
 
         return response()->json($user);
     }

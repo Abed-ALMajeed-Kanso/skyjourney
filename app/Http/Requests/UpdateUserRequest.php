@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Auth\Access\AuthorizationException;
 
-class StoreUserRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     public function authorize()
     {
@@ -22,9 +21,9 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:8|confirmed', // Password confirmation
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $this->route('id'), // Ensure the email is unique except for the current user
+            'password' => 'nullable|string|min:8|confirmed', // Password is optional on update, must be confirmed if provided
         ];
     }
 
@@ -34,7 +33,6 @@ class StoreUserRequest extends FormRequest
             'name.required' => 'Name is required',
             'email.required' => 'Email is required',
             'email.unique' => 'Email must be unique',
-            'password.required' => 'Password is required',
             'password.confirmed' => 'Passwords do not match',
         ];
     }

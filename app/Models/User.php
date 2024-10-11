@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait; 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
 class User extends Authenticatable implements Auditable 
@@ -24,6 +25,8 @@ class User extends Authenticatable implements Auditable
         'name',
         'email',
         'password',
+        'email_verified_at',  
+        'remember_token',
     ];
 
     /**
