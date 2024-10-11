@@ -48,5 +48,8 @@ class DatabaseSeeder extends Seeder
       // after I also generated an app password of my personel email
       // and set it in the .env file and I runned: php artisan flights:send-reminders
       
+      // Auditing was applied for Users, Flights, and Passengers Tables.
+
+      
     }
 }

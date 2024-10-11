@@ -6,6 +6,7 @@ use App\Http\Controllers\PassengerController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,9 @@ Route::post('/login_Passenger', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout_Passenger', [AuthController::class, 'logout']);
 });
+
+// importing users from execel file 
+Route::get('/import_users', [ImportController::class, 'import']);
 
 Route::get('/', function () {
     return view('welcome');
