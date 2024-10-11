@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum', 'admin')->group(function () {
     Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete user
 });
 
-// Authentication routes
+// Authentication routes (for Users Not Passengers!)
 Route::post('/login', [AuthController::class, 'login']);
 
 // Authentication routes (only for authenticated users)
@@ -46,6 +46,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+// Authentication routes (for Users Not Passengers!)
+Route::post('/login_Passenger', [AuthController::class, 'login']);
+
+// Authentication routes (only for authenticated users)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout_Passenger', [AuthController::class, 'logout']);
+});
 
 Route::get('/', function () {
     return view('welcome');
