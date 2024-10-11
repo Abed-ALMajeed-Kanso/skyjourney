@@ -2,34 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Intervention\Image\Facades\Image; // Use this for image processing
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ImageUploadController extends Controller
 {
     public function upload(Request $request)
     {
+        Log::info('Upload started');
+
+        // Validate the image
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+        
+        Log::info('Validation passed');
 
         // Store original image
         $originalImage = $request->file('image');
-        $originalPath = 'images/original/';
         $originalImageName = time() . '_' . $originalImage->getClientOriginalName();
-        $originalImage->move(public_path($originalPath), $originalImageName);
+        $originalImagePath = 'upload/Images/original/' . $originalImageName;
+
+        // Save the original image to the storage/app/upload/Images/original directory
+        $originalImage->storeAs('upload/Images/original', $originalImageName);
+        Log::info('Original image saved');
 
         // Create thumbnail
-        $thumbnailPath = 'images/thumbnails/';
         $thumbnailImage = Image::make($originalImage->getRealPath());
         $thumbnailImage->resize(150, 150); // Resize to thumbnail size
-        $thumbnailImage->save(public_path($thumbnailPath) . $originalImageName);
+
+        // Save the thumbnail to the storage/app/upload/Images/thumbnails directory
+        $thumbnailPath = 'upload/Images/thumbnails/' . $originalImageName;
+        $thumbnailImage->save(storage_path('app/' . $thumbnailPath));
+        Log::info('Thumbnail created and saved');
 
         // Save paths to database or return them in response
         return response()->json([
-            'original' => asset($originalPath . $originalImageName),
-            'thumbnail' => asset($thumbnailPath . $originalImageName),
+            'original' => asset('storage/' . $originalImagePath),
+            'thumbnail' => asset('storage/' . $thumbnailPath),
         ]);
     }
 }

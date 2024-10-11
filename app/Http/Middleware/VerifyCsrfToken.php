@@ -18,5 +18,6 @@ class VerifyCsrfToken extends Middleware
         'logout',
         'register',
         'import_users',
+        'upload_image',
     ];
 }

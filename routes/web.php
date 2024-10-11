@@ -59,7 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // importing users from execel file 
 Route::get('/import_users', [ImportController::class, 'import']);
 
-// upload image
+// upload image 
 Route::post('/upload_image', [ImageUploadController::class, 'upload']);
 
 Route::get('/', function () {
