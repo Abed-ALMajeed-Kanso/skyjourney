@@ -10,16 +10,34 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
+        // Validate the request
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+    
+        // Logout the user to clear all sessions
+        Auth::logout();
+    
+        // Attempt to log in the user with the provided credentials
+        if (Auth::attempt($request->only('email', 'password'))) {
+            // Regenerate session to prevent session fixation
+            $request->session()->regenerate();
+    
+            // Get the authenticated user
             $user = Auth::user();
+    
+            // Create a new token for the user
             $token = $user->createToken('YourAppName')->plainTextToken;
-            return response()->json(['token' => $token]);
+    
+            // Return the token in the response
+            return response()->json(['token' => $token], 200);
         }
-
+    
+        // Return failure response if authentication fails
         return response()->json(['message' => 'Unauthorized'], 401);
     }
+    
 
     public function logout(Request $request)
     {

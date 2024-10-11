@@ -7,6 +7,7 @@ use App\Http\Controllers\FlightController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\ImageUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // importing users from execel file 
 Route::get('/import_users', [ImportController::class, 'import']);
+
+// upload image
+Route::post('/upload_image', [ImageUploadController::class, 'upload']);
 
 Route::get('/', function () {
     return view('welcome');

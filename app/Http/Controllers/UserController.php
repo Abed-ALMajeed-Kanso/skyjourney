@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\User; 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; 
-use Illuminate\Validation\Rule;
+use App\Http\Requests\StoreUserRequest; // Import the StoreUserRequest
+use App\Http\Requests\UpdateUserRequest; // Import the UpdateUserRequest
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the users.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
         $users = User::all(); // Retrieve all users
         return response()->json($users);
@@ -23,33 +24,30 @@ class UserController extends Controller
     /**
      * Store a newly created user in storage.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param StoreUserRequest $request
+     * @return JsonResponse
      */
+    public function store(StoreUserRequest $request): JsonResponse
+    {
+        // Validation is already handled in StoreUserRequest
 
-    public function store(Request $request) {
-        $formFields = $request->validate([
-            'name' => ['required', 'min:3'],
-            'email' => ['required', 'email'],
-            'password' => 'required|confirmed|min:6'
-        ]);
+        // Create the user with hashed password
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]); 
 
-        $formFields['password'] = bcrypt($formFields['password']);
-
-        $user = User::create($formFields); 
-
-        return response()->json($user);
-
-       //return response()->json("User Created Successfully");
+        return response()->json($user, 201); // Return 201 Created status
     }
 
     /**
      * Display the specified user.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         $user = User::findOrFail($id); // Find the user or fail
         return response()->json($user);
@@ -58,46 +56,38 @@ class UserController extends Controller
     /**
      * Update the specified user in storage.
      *
-     * @param Request $request
+     * @param UpdateUserRequest $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $id,
-            'password' => 'sometimes|required|string|min:8|confirmed',
-        ]);
+        // Validation is already handled in UpdateUserRequest
 
         // Find the user
         $user = User::findOrFail($id);
 
-        // Update password if provided
-        if (isset($validatedData['password'])) {
-            $validatedData['password'] = Hash::make($validatedData['password']);
+        // Update password if provided and hash it
+        if ($request->filled('password')) {
+            $request->merge(['password' => Hash::make($request->password)]);
         }
 
         // Update user attributes
-        $user->update(array_filter($validatedData)); // Only update non-empty fields
+        $user->update($request->only('name', 'email', 'password')); // Only update specified fields
 
         return response()->json($user);
-
-        //return response()->json("User Updated Successfully");
     }
+
     /**
      * Remove the specified user from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         $user = User::findOrFail($id); 
         $user->delete(); 
         return response()->json(['message' => 'User deleted successfully']);
     }
 }
-
-
-// newpassword123
