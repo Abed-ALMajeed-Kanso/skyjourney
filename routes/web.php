@@ -59,8 +59,13 @@ Route::middleware('auth:sanctum')->group(function () {
 // importing users from execel file 
 Route::get('/import_users', [ImportController::class, 'import']);
 
-// upload image 
-Route::post('/upload_image', [ImageUploadController::class, 'upload']);
+// For the form view
+Route::get('/upload', function () {
+    return view('upload'); 
+});
+
+// For handling the image upload
+Route::post('/upload_image', [ImageUploadController::class, 'upload'])->name('image.upload');
 
 Route::get('/', function () {
     return view('welcome');

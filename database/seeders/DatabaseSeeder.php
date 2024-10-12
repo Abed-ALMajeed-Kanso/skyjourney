@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
 
       // S3 was not used and images were stored locally in the 
       // storage/app/uploads directory (also the excel file is their)
-      // also unable to test without a form.
+      // only testing the image was with a form.
 
     }
 }
