@@ -10,11 +10,11 @@ use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait; 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
+use Illuminate\Database\Eloquent\SoftDeletes;  
 
 class User extends Authenticatable implements Auditable 
 {
-    use HasApiTokens, HasFactory, Notifiable, AuditableTrait;
+    use HasApiTokens, HasFactory, Notifiable, AuditableTrait, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -58,4 +58,5 @@ class User extends Authenticatable implements Auditable
     {
         return $this->roles()->where('name', $role)->exists();
     }
+
 }

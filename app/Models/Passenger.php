@@ -8,10 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use OwenIt\Auditing\Contracts\Auditable; 
 use OwenIt\Auditing\Auditable as AuditableTrait; 
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable; 
 
 class Passenger extends Authenticatable implements Auditable
 {
-    use SoftDeletes, HasFactory, AuditableTrait, HasApiTokens;
+    use SoftDeletes, HasFactory, AuditableTrait, HasApiTokens, Notifiable;
 
     protected $dates = ['deleted_at'];
 

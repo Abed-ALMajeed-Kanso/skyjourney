@@ -57,5 +57,7 @@ class DatabaseSeeder extends Seeder
       // storage/app/uploads directory (also the excel file is their)
       // only testing the image was with a form.
 
+      // Security headers and Sanitize Input are middlewares added in the kernel.
+      
     }
 }
