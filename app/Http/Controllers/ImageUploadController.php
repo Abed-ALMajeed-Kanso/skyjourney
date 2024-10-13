@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Passenger; // Make sure to import the Passenger model
 
 class ImageUploadController extends Controller
 {
@@ -35,10 +36,18 @@ class ImageUploadController extends Controller
                 $thumbnailImage->save(storage_path('app/' . $thumbnailPath));
             }
 
-            // Return success response
+            // Save the image paths to the database under the authenticated passenger
+            $passenger = $request->user(); // Get the logged-in passenger
+            $passenger->image = json_encode([
+                'original' => $originalImagePath,
+                'thumbnail' => $thumbnailPath,
+            ]);
+            $passenger->save();
+
+            // Return success response with the image URLs
             return response()->json([
-                'original' => url('storage/uploads/Images/original/' . $originalImageName),
-                'thumbnail' => url('storage/uploads/Images/thumbnails/' . $originalImageName),
+                'original' => url('storage/' . $originalImagePath),
+                'thumbnail' => url('storage/' . $thumbnailPath),
             ]);
         }
 

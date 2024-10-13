@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\Passenger;
 
 class AuthController extends Controller
 {
+    // Login for normal users
     public function login(Request $request)
     {
         // Validate the request
@@ -15,58 +18,81 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
-    
-        // Logout the user to clear all sessions
-        Auth::logout();
-    
-        // Attempt to log in the user with the provided credentials
-        if (Auth::attempt($request->only('email', 'password'))) {
-            // Regenerate session to prevent session fixation
-            $request->session()->regenerate();
-    
-            // Get the authenticated user
-            $user = Auth::user();
-    
-            // Create a new token for the user
+
+        // Attempt to find the user by email
+        $user = User::where('email', $request->email)->first();
+
+        // If the user exists and the password matches
+        if ($user && Hash::check($request->password, $user->password)) {
+            // Clear all existing tokens for this user (if needed)
+            $user->tokens()->delete();
+
+            // Generate a new Sanctum token
             $token = $user->createToken('YourAppName')->plainTextToken;
-    
+
             // Return the token in the response
             return response()->json(['token' => $token], 200);
         }
-    
-        // Return failure response if authentication fails
+
+        // Return unauthorized response if authentication fails
         return response()->json(['message' => 'Unauthorized'], 401);
     }
-    
 
+    // Logout for normal users
     public function logout(Request $request)
     {
-        // Get the token from the 'Authorization' header
-        $headerToken = $request->bearerToken(); // Extracts the token from the Authorization header
-    
-        // Check if the user is authenticated and retrieve their tokens
+        // Get the authenticated user
         $user = $request->user();
+
+        if ($user) {
+            // Revoke all tokens for the user
+            $user->tokens()->delete();
+
+            return response()->json(['message' => 'Successfully logged out']);
+        }
+
+        return response()->json(['message' => 'No active session found'], 404);
+    }
+
+    // Login for passengers
+    public function login_passenger(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        // Attempt to find the passenger by email
+        $passenger = Passenger::where('email', $request->email)->first();
+
+        // If the passenger exists and the password matches
+        if ($passenger && Hash::check($request->password, $passenger->password)) {
+            // Clear all existing tokens for this passenger (if needed)
+            $passenger->tokens()->delete();
+
+            // Generate a new Sanctum token
+            $token = $passenger->createToken('PassengerApp')->plainTextToken;
+
+            // Return the token in the response
+            return response()->json(['token' => $token], 200);
+        }
+
+        // Return unauthorized response if authentication fails
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    // Logout for passengers
+    public function logout_passenger(Request $request)
+    {
+        $passenger = $request->user(); // This should be set by the middleware
     
-        // Check if the user has any tokens
-        if ($user && $user->tokens()->count() > 0) {
-            // Check if the token from the header matches any token stored for this user
-            $storedToken = $user->tokens()->where('token', hash('sha256', $headerToken))->first();
-    
-            if ($storedToken) {
-                // Delete the token that matches
-                $storedToken->delete();
-    
-                return response()->json(['message' => 'Successfully logged out']);
-            } else {
-                // If token doesn't match, return an error
-                return response()->json(['message' => 'Invalid token'], 401);
-            }
+        if ($passenger) {
+            $passenger->tokens()->delete(); // Deletes all tokens for the user
+            return response()->json(['message' => 'Successfully logged out']);
         }
     
-        // If no tokens exist or user is not authenticated
-        return response()->json(['message' => 'No active session found.'], 404);
+        return response()->json(['message' => 'No active session found'], 404);
     }
-    
-
     
 }

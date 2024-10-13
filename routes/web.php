@@ -1,72 +1,55 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PassengerController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ImageUploadController;
+use App\Http\Controllers\ImportController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+// Public routes for logging in
+Route::post('/login', [AuthController::class, 'login']); // Login for users
+Route::post('/login_passenger', [AuthController::class, 'login_passenger'])->name('login_passenger');
 
-// Route for passengers
-Route::get('/passengers', [PassengerController::class, 'index']);
 
-// Route for flights
-Route::get('/flights', [FlightController::class, 'index']); // This will list all flights
-
-// get passenger by flight id
-Route::get('/flights/{flight}/passengers', [FlightController::class, 'passengers']);
-
-// CRUD for users
-Route::get('/users', [UserController::class, 'index']);     // Get all users
-Route::get('/users/{id}', [UserController::class, 'show']);  // Get a single user
-
-// CRUD for users for Admins
-Route::middleware('auth:sanctum', 'admin')->group(function () {
-    Route::post('/users', [UserController::class, 'store']); // create user
-    Route::put('/users/{id}', [UserController::class, 'update']); // Update user
-    Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete user
-});
-
-// Authentication routes (for Users Not Passengers!)
-Route::post('/login', [AuthController::class, 'login']);
-
-// Authentication routes (only for authenticated users)
+// Routes for normal users (protected by auth:sanctum for users)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout']); // Logout for users
+
+    Route::get('/users', [UserController::class, 'index']);     // Get all users
+    Route::get('/users/{id}', [UserController::class, 'show']);  // Get a single user
+
+    Route::middleware('admin')->group(function () {
+        Route::post('/users', [UserController::class, 'store']); // Create user
+        Route::put('/users/{id}', [UserController::class, 'update']); // Update user
+        Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete user
+    });
 });
 
-// Authentication routes (for Users Not Passengers!)
-Route::post('/login_Passenger', [AuthController::class, 'login']);
+// Routes for passengers (protected by auth:sanctum:passengers for passengers)
+Route::middleware('auth:passengers')->group(function () {
+    Route::post('/logout_passenger', [AuthController::class, 'logout_passenger']); // Logout for passengers
 
-// Authentication routes (only for authenticated users)
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout_Passenger', [AuthController::class, 'logout']);
+    // Protect the upload view route
+    Route::get('/upload', function () {
+        return view('upload'); 
+    })->name('image.upload.form');
+
+    // Protect the image upload route
+    Route::post('/upload_image', [ImageUploadController::class, 'upload'])->name('image.upload');
 });
 
-// importing users from execel file 
+
+// Public routes for passengers and flights
+Route::get('/passengers', [PassengerController::class, 'index']); // Public route for passengers
+Route::get('/flights', [FlightController::class, 'index']); // Public route for flights
+Route::get('/flights/{flight}/passengers', [FlightController::class, 'passengers']); // Get passengers by flight ID
+
+// Import users from an Excel file route
 Route::get('/import_users', [ImportController::class, 'import']);
 
-// For the form view
-Route::get('/upload', function () {
-    return view('upload'); 
-});
-
-// For handling the image upload
-Route::post('/upload_image', [ImageUploadController::class, 'upload'])->name('image.upload');
-
+// Home route
 Route::get('/', function () {
     return view('welcome');
 });

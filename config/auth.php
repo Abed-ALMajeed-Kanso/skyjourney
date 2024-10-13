@@ -40,6 +40,22 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => false,
+        ],
+
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
+        'passengers' => [ // Custom guard for passengers
+            'driver' => 'sanctum',
+            'provider' => 'passengers',
+        ],
     ],
 
     /*
@@ -65,12 +81,12 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'passengers' => [ // Custom provider for passengers
+            'driver' => 'eloquent',
+            'model' => App\Models\Passenger::class, // Ensure you have this model
+        ],
     ],
-
+    
     /*
     |--------------------------------------------------------------------------
     | Resetting Passwords

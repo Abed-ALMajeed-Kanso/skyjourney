@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth; // Import the Auth facade
 use Illuminate\Auth\Access\AuthorizationException;
 
 class StoreUserRequest extends FormRequest
@@ -10,7 +11,7 @@ class StoreUserRequest extends FormRequest
     public function authorize()
     {
         // Check if the user is authenticated and has the admin role
-        return Auth::user() && Auth::user()->hasRole('admin');
+        return Auth::check() && Auth::user()->hasRole('admin'); // Use Auth::check() for safety
     }
 
     protected function failedAuthorization()
