@@ -30,16 +30,19 @@ class DatabaseSeeder extends Seeder
       // and errors in relational data occured
 
       // User Samples for Excel import
-      // User::factory()->count(10)->create();
+      // User::factory()->count(5)->create();
 
-      // Note: An Admin role was added in the MySQL Databse
-      // for API testing for roles using the following SQL statements:
+      // Note: roles were added to the Databse manually by
+      // the following SQL statements:
 
       // INSERT INTO roles (name, created_at, updated_at) VALUES 
       // ('admin', NOW(), NOW());  
 
-      // INSERT INTO role_user (user_id, role_id, created_at, updated_at) 
-      // VALUES (1, 1, NOW(), NOW());
+      // INSERT INTO roles (name, created_at, updated_at) VALUES 
+      // ('manager', NOW(), NOW()); 
+
+      // INSERT INTO roles (name, created_at, updated_at) VALUES 
+      // ('viewer', NOW(), NOW()); 
 
       // To test the functionality of the reminder email
       // I changed the deparature time of one of the flights 

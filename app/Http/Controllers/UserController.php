@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Http\Requests\StoreUserRequest; 
 use App\Http\Requests\UpdateUserRequest; 
+use App\Http\Requests\ShowUsersRequest; 
+use App\Http\Requests\ShowUserByIdRequest; 
 use Illuminate\Http\JsonResponse;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedSort;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
+use App\Imports\DeleteUserRequest;
 
 class UserController extends Controller
 {
@@ -16,12 +24,29 @@ class UserController extends Controller
      *
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(ShowUsersRequest $request): JsonResponse
     {
-        $users = User::all(); // Retrieve all users
+        $users = QueryBuilder::for(User::class)
+            ->allowedFilters([
+                AllowedFilter::partial('name'),
+                AllowedFilter::partial('email'),
+            ])
+            ->allowedSorts(['name', 'email', 'created_at'])
+            ->paginate($request->input('per_page', 10));
+
         return response()->json($users);
     }
-
+    /**
+     * Display the specified user.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(ShowUserByIdRequest $request, $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
     /**
      * Store a newly created user in storage.
      *
@@ -43,19 +68,6 @@ class UserController extends Controller
 
         return response()->json($user, 201); // Return 201 Created status
     }
-
-    /**
-     * Display the specified user.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function show(int $id): JsonResponse
-    {
-        $user = User::findOrFail($id); // Find the user or fail
-        return response()->json($user);
-    }
-
     /**
      * Update the specified user in storage.
      *
@@ -90,10 +102,22 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(DeleteUserRequest $request, int $id): JsonResponse
     {
         $user = User::findOrFail($id); 
         $user->delete(); 
         return response()->json(['message' => 'User deleted successfully']);
+    }
+
+    public function import()
+    {
+        // Specify the path to the CSV file 
+        $filePath = storage_path('app/uploads/users.csv');
+
+        // Load the data from the CSV file
+        $data = Excel::toArray(new UsersImport, $filePath);
+
+        // Assuming your data is in the first sheet
+        return response()->json($data[0]);
     }
 }

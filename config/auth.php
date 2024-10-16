@@ -51,11 +51,6 @@ return [
             'driver' => 'sanctum',
             'provider' => 'users',
         ],
-
-        'passengers' => [ // Custom guard for passengers
-            'driver' => 'sanctum',
-            'provider' => 'passengers',
-        ],
     ],
 
     /*
@@ -79,11 +74,6 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
-        ],
-
-        'passengers' => [ // Custom provider for passengers
-            'driver' => 'eloquent',
-            'model' => App\Models\Passenger::class, // Ensure you have this model
         ],
     ],
     

@@ -4,52 +4,97 @@ namespace App\Http\Controllers;
 
 use App\Models\Flight;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+use App\Http\Requests\ShowFlightsRequest;
+use App\Http\Requests\ShowFlightByIdRequest;
+use App\Http\Requests\ShowPassengerByFlightIdRequest;
+use App\Http\Requests\UpdateFlightRequest;
+use App\Http\Requests\StoreFlightRequest;
+
+// use App\Http\Requests\DeleteFlightRequest;
 
 class FlightController extends Controller
 {
     /**
      * Get all flights with pagination, filtering, and sorting.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(ShowFlightByIdRequest $request)
     {
-        // Define the base query
-        $query = Flight::query();
-
-        // Apply filters (e.g., by departure_city, arrival_city)
-        if ($request->has('departure_city')) {
-            $query->where('departure_city', 'like', '%' . $request->input('departure_city') . '%');
-        }
-
-        if ($request->has('arrival_city')) {
-            $query->where('arrival_city', 'like', '%' . $request->input('arrival_city') . '%');
-        }
-
-        // Sorting (e.g., by departure_time, arrival_time)
-        if ($request->has('sort_by')) {
-            $sortField = $request->input('sort_by');
-            $sortOrder = $request->input('sort_order', 'asc'); // Default to ascending order
-            $query->orderBy($sortField, $sortOrder);
-        }
-
-        // Paginate the results (default to 10 items per page)
-        $flights = $query->paginate($request->input('per_page', 10));
+        $flights = QueryBuilder::for(Flight::class)
+            ->allowedFilters([AllowedFilter::partial('departure_city'), AllowedFilter::partial('arrival_city')])
+            ->allowedSorts(['departure_time', 'arrival_time'])
+            ->paginate($request->input('per_page', 10));
 
         return response()->json($flights);
     }
 
-    public function passengers($flightId)
+    /**
+     * Store a new flight.
+     */
+    public function store(StoreFlightRequest $request)
     {
-        // Find the flight by ID
-        $flight = Flight::findOrFail($flightId);
+        $validatedData = $request->validate([
+            'number' => 'required|string|max:255|unique:flights,number',
+            'departure_city' => 'required|string|max:255',
+            'arrival_city' => 'required|string|max:255',
+            'departure_time' => 'required|date',
+            'arrival_time' => 'required|date',
+        ]);
+
+        $flight = Flight::create($validatedData);
+
+        return response()->json($flight, 201);
+    }
+
+    /**
+     * Show a single flight.
+     */
+    public function show(ShowFlightByIdRequest $id)
+    {
+        $flight = Flight::findOrFail($id);
+        return response()->json($flight);
+    }
+
+    /**
+     * Update a flight's details.
+     */
+    public function update(UpdateFlightRequest $request, $id)
+    {
+        // Find the flight by ID or fail
+        $flight = Flight::findOrFail($id);
+
+        // The request is already validated by UpdateFlightRequest, so get the validated data
+        $validatedData = $request->validated();
+
+        // Update the flight with the validated data
+        $flight->update($validatedData);
+
+        // Return the updated flight as a JSON response
+        return response()->json($flight);
+    }
+
+
+    /**
+     * Delete a flight.
+     */
+    public function destroy($id)
+    {
+        $flight = Flight::findOrFail($id);
+        $flight->delete();
     
-        // Retrieve passengers for the flight
-        $passengers = $flight->passengers()->paginate(10);  // Paginate if needed
-    
-        return response()->json($passengers);
+        return response()->json(['message' => 'Flight deleted successfully']);
     }
     
 
+    /**
+     * Get passengers for a specific flight.
+     */
+    public function passengers(ShowPassengerByFlightIdRequest $request, $flightId)
+    {
+        $flight = Flight::findOrFail($flightId);
+        $passengers = $flight->passengers()->paginate(10);
+        return response()->json($passengers);
+    
+    }
 }

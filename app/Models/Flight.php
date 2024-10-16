@@ -11,6 +11,14 @@ class Flight extends Model implements Auditable
 {
     use HasFactory, AuditableTrait;
 
+    protected $fillable = [
+        'number',
+        'departure_city',
+        'arrival_city',
+        'departure_time',
+        'arrival_time',
+    ];
+
     public function passengers()
     {
         return $this->hasMany(Passenger::class);

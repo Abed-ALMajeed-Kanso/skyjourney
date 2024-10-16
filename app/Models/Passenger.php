@@ -14,6 +14,18 @@ class Passenger extends Authenticatable implements Auditable
 {
     use SoftDeletes, HasFactory, AuditableTrait, HasApiTokens, Notifiable;
 
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'password',
+        'dob',
+        'passport_expiry_date',
+        'image',
+        'thumbnail',
+        'updated_at', 
+    ];
+
     protected $dates = ['deleted_at'];
 
     // Ensure that the image field can be accessed as an array
