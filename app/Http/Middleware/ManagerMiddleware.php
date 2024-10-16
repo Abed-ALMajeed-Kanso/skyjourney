@@ -21,7 +21,7 @@ class ManagerMiddleware
         if (Auth::check()) {
             // Check if the user has the admin role
             $user = Auth::user();
-            if ($user->hasRole('manager')) { // Assuming you have a method `hasRole`
+            if ($user->hasRole('manager') || $user->hasRole('admin')) { // Assuming you have a method `hasRole`
                 return $next($request);
             }
         }

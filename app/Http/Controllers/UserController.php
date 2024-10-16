@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
 use App\Imports\DeleteUserRequest;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class UserController extends Controller
 {
@@ -102,7 +103,7 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function destroy(DeleteUserRequest $request, int $id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         $user = User::findOrFail($id); 
         $user->delete(); 

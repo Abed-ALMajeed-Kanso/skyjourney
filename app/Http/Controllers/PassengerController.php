@@ -47,20 +47,11 @@ class PassengerController extends Controller
     /**
      * Store a new passenger.
      */
-    public function store(StorePassengerRequest $request): \Illuminate\Http\JsonResponse
+    public function store(StorePassengerRequest $request): JsonResponse
     {
-        // Validate the incoming JSON data
-        $validatedData = $request->validate([
-            'flight_id' => 'required|exists:flights,id',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:passengers,email',
-            'password' => 'required|string|min:8',
-            'dob' => 'required|date',
-            'passport_expiry_date' => 'required|date|after:today',
-            'image' => 'nullable|string', // Change to string for base64
-        ]);
-
+        // The validation is already handled by StorePassengerRequest, so no need to validate again.
+        $validatedData = $request->validated();
+    
         // Handle image upload if present in JSON
         if (isset($validatedData['image'])) {
             // Decode the base64 image
@@ -68,35 +59,36 @@ class PassengerController extends Controller
             $image = str_replace('data:image/jpeg;base64,', '', $imageData);
             $image = str_replace(' ', '+', $image);
             $originalImage = base64_decode($image);
-
+    
             // Store the original image locally
             $originalImageName = time() . '_image.jpg';
             $originalImagePath = 'uploads/Images/original/' . $originalImageName;
             Storage::disk('public')->put($originalImagePath, $originalImage);
-
+    
             // Create a thumbnail and store it on S3
             $thumbnailImage = Image::make($originalImage)->resize(150, 150)->encode('jpg');
             $thumbnailImageName = time() . '_thumb.jpg';
             $thumbnailPath = 'uploads/Images/thumbnails/' . $thumbnailImageName;
             Storage::disk('s3')->put($thumbnailPath, (string) $thumbnailImage);
-
+    
             // Store the paths in the database
             $validatedData['image'] = $originalImagePath; // Local storage path
             $validatedData['thumbnail'] = Storage::disk('s3')->url($thumbnailPath); // S3 URL
         }
-
+    
         // Hash the password before saving
         $validatedData['password'] = bcrypt($validatedData['password']);
-
-        // Set timestamps to the current time
-        $validatedData['created_at'] = Carbon::now();
-        $validatedData['updated_at'] = Carbon::now();
-
+    
+        // Add timestamps explicitly (optional, Laravel should handle it automatically)
+        $validatedData['created_at'] = now();
+        $validatedData['updated_at'] = now();
+    
         // Create a new passenger record
         $passenger = Passenger::create($validatedData);
-
+    
         return response()->json($passenger, 201);
     }
+    
     
 
 

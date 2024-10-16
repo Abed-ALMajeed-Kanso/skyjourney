@@ -13,6 +13,7 @@ class StorePassengerRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        // Only allow access if the user has the 'admin' or 'manager' role
         return $this->user() && ($this->user()->hasRole('admin') || $this->user()->hasRole('manager'));
     }
 
@@ -24,14 +25,14 @@ class StorePassengerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'flight_id' => 'required|exists:flights,id', // Ensures flight exists in the flights table
+            'flight_id' => 'required|exists:flights,id', 
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:passengers,email',
-            'password' => 'required|string|min:8', // Password must be at least 8 characters long
+            'email' => 'required|email|unique:passengers,email', // Ensure email is unique in the passengers table
+            'password' => 'required|string|min:8', // Ensure password is at least 8 characters
             'dob' => 'required|date', // Date of birth is required
-            'passport_expiry_date' => 'required|date|after:today', // Passport expiry date must be in the future
-            'image' => 'nullable|string', // Accept base64 encoded string instead of file upload
+            'passport_expiry_date' => 'required|date|after:today', // Ensure passport expiry date is in the future
+            'image' => 'nullable|string', // Accept base64-encoded string for the image
         ];
     }
 }

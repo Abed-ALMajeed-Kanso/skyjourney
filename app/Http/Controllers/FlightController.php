@@ -50,11 +50,11 @@ class FlightController extends Controller
     /**
      * Show a single flight.
      */
-    public function show(ShowFlightByIdRequest $id)
+    public function show(ShowFlightByIdRequest $request, $id)
     {
         $flight = Flight::findOrFail($id);
         return response()->json($flight);
-    }
+    }    
 
     /**
      * Update a flight's details.
@@ -95,6 +95,6 @@ class FlightController extends Controller
         $flight = Flight::findOrFail($flightId);
         $passengers = $flight->passengers()->paginate(10);
         return response()->json($passengers);
-    
     }
+    
 }

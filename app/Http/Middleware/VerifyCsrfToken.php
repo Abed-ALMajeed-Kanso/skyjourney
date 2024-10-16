@@ -18,6 +18,7 @@ class VerifyCsrfToken extends Middleware
         'passengers/*',
         'flights',
         'flights/*',
+        'flights_passengers/',
         'login',
         'logout',
         'import_users',

@@ -32,18 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update'); // Update user
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy'); // Delete user
 
-        // Passenger management routes
-        Route::post('/passengers', [PassengerController::class, 'store'])->name('passengers.store'); // Create passenger
-        Route::put('/passengers/{id}', [PassengerController::class, 'update'])->name('passengers.update'); // Update passenger
-        Route::delete('/passengers/{id}', [PassengerController::class, 'destroy'])->name('passengers.destroy'); // Delete passenger
-
-        // Flight management routes
-        Route::post('/flights', [FlightController::class, 'store'])->name('flights.store'); // Create flight
-        Route::put('/flights/{id}', [FlightController::class, 'update'])->name('flights.update'); // Update flight
-        Route::delete('/flights/{id}', [FlightController::class, 'destroy'])->name('flights.destroy'); // Delete flight
-
         // Import users from an Excel file route
-        Route::get('/import_users', [ImportController::class, 'import'])->name('users.import');
+        Route::get('/import_users', [UserController::class, 'import'])->name('users.import');
     });
 
     // Manager routes (Limited to passengers and flights, but no access to users)
