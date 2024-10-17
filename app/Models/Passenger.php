@@ -15,6 +15,7 @@ class Passenger extends Authenticatable implements Auditable
     use SoftDeletes, HasFactory, AuditableTrait, HasApiTokens, Notifiable;
 
     protected $fillable = [
+        'flight_id',
         'first_name',
         'last_name',
         'email',
@@ -22,7 +23,6 @@ class Passenger extends Authenticatable implements Auditable
         'dob',
         'passport_expiry_date',
         'image',
-        'thumbnail',
         'updated_at', 
     ];
 

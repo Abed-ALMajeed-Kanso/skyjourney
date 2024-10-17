@@ -11,15 +11,14 @@ use App\Http\Requests\ShowFlightByIdRequest;
 use App\Http\Requests\ShowPassengerByFlightIdRequest;
 use App\Http\Requests\UpdateFlightRequest;
 use App\Http\Requests\StoreFlightRequest;
-
-// use App\Http\Requests\DeleteFlightRequest;
+use Illuminate\Http\JsonResponse;
 
 class FlightController extends Controller
 {
     /**
      * Get all flights with pagination, filtering, and sorting.
      */
-    public function index(ShowFlightByIdRequest $request)
+    public function index(Request $request)
     {
         $flights = QueryBuilder::for(Flight::class)
             ->allowedFilters([AllowedFilter::partial('departure_city'), AllowedFilter::partial('arrival_city')])
@@ -34,18 +33,19 @@ class FlightController extends Controller
      */
     public function store(StoreFlightRequest $request)
     {
-        $validatedData = $request->validate([
-            'number' => 'required|string|max:255|unique:flights,number',
-            'departure_city' => 'required|string|max:255',
-            'arrival_city' => 'required|string|max:255',
-            'departure_time' => 'required|date',
-            'arrival_time' => 'required|date',
-        ]);
-
+        // Since StoreFlightRequest already validates, we can use the validated data directly
+        $validatedData = $request->validated();
+    
+        // Create the new flight record
         $flight = Flight::create($validatedData);
-
-        return response()->json($flight, 201);
+    
+        // Return the newly created flight record with a 201 status code
+        return response()->json([
+            'message' => 'Flight created successfully',
+            'flight' => $flight,
+        ], 201);
     }
+    
 
     /**
      * Show a single flight.
@@ -61,19 +61,11 @@ class FlightController extends Controller
      */
     public function update(UpdateFlightRequest $request, $id)
     {
-        // Find the flight by ID or fail
         $flight = Flight::findOrFail($id);
-
-        // The request is already validated by UpdateFlightRequest, so get the validated data
         $validatedData = $request->validated();
-
-        // Update the flight with the validated data
         $flight->update($validatedData);
-
-        // Return the updated flight as a JSON response
         return response()->json($flight);
     }
-
 
     /**
      * Delete a flight.
@@ -85,7 +77,6 @@ class FlightController extends Controller
     
         return response()->json(['message' => 'Flight deleted successfully']);
     }
-    
 
     /**
      * Get passengers for a specific flight.
@@ -96,5 +87,4 @@ class FlightController extends Controller
         $passengers = $flight->passengers()->paginate(10);
         return response()->json($passengers);
     }
-    
 }
