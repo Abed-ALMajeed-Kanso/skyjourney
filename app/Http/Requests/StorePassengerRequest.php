@@ -30,13 +30,14 @@ class StorePassengerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'flight_id' => 'required|exists:flights,id', 
+            'flight_id' => 'required|exists:flights,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:passengers,email',
             'password' => 'required|string|min:8',
             'dob' => 'required|date',
             'passport_expiry_date' => 'required|date|after:today',
+            'image' => 'nullable|string',
         ];
-    } 
+    }
 }

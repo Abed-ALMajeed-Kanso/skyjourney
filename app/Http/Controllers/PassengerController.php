@@ -52,18 +52,43 @@ class PassengerController extends Controller
         $validatedData = $request->validated();
     
         // Hash the password before saving
+        if (isset($validatedData['image'])) {
+            // Decode the base64 image
+            $imageData = $validatedData['image'];
+            $image = str_replace('data:image/jpeg;base64,', '', $imageData);
+            $image = str_replace(' ', '+', $image);
+            $originalImage = base64_decode($image);
+    
+            // Store the original image locally
+            $originalImageName = time() . '_image.jpg';
+            $originalImagePath = 'uploads/Images/original/' . $originalImageName;
+            Storage::disk('public')->put($originalImagePath, $originalImage);
+    
+            // Create a thumbnail and store it on S3
+            $thumbnailImage = Image::make($originalImage)->resize(150, 150)->encode('jpg');
+            $thumbnailImageName = time() . '_thumb.jpg';
+            $thumbnailPath = 'uploads/Images/thumbnails/' . $thumbnailImageName;
+            Storage::disk('s3')->put($thumbnailPath, (string) $thumbnailImage);
+    
+            // Store the paths in the database
+            $validatedData['image'] = $originalImagePath; // Local storage path
+            $validatedData['thumbnail'] = Storage::disk('s3')->url($thumbnailPath); // S3 URL
+        }
+    
+        // Hash the password before saving
         $validatedData['password'] = bcrypt($validatedData['password']);
+
+        // Add timestamps explicitly (optional, Laravel should handle it automatically)
+        $validatedData['created_at'] = now();
+        $validatedData['updated_at'] = now();
     
-        // Create a new passenger record, which must include 'flight_id'
+        // Create a new passenger record
         $passenger = Passenger::create($validatedData);
-    
+
         return response()->json($passenger, 201);
     }
     
-
     
-    
-
 
     /**
      * Update a passenger's details.

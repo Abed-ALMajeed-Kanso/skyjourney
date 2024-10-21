@@ -17,17 +17,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes requiring authentication
     Route::get('/passengers', [PassengerController::class, 'index'])->name('passengers.index'); // List passengers
-    Route::get('/passengers/{id}', [PassengerController::class, 'show'])->name('passengers.show'); // View a single passenger
+    Route::get('/Get_passenger/{id}', [PassengerController::class, 'show'])->name('passengers.show'); // View a single passenger
     Route::get('/flights', [FlightController::class, 'index'])->name('flights.index'); // List flights
-    Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.show'); // View a single flight
-    Route::get('/flights_passengers/{id}', [FlightController::class, 'passengers'])->name('flights.passengers'); // Get passengers by flight ID
+    Route::get('/Get_flight/{id}', [FlightController::class, 'show'])->name('flights.show'); // View a single flight
+    Route::get('/Get_passengers_By_flight/{id}', [FlightController::class, 'passengers'])->name('flights.passengers'); // Get passengers by flight ID
 
     // Admin routes (Full access to all routes)
     Route::middleware('admin')->group(function () {
 
         // User management routes
         Route::get('/users', [UserController::class, 'index'])->name('users.index'); // Get all users
-        Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show'); // Get a single user
+        Route::get('/Get_user/{id}', [UserController::class, 'show'])->name('users.show'); // Get a single user
         Route::post('/Create_user', [UserController::class, 'store'])->name('users.store'); // Create user
         Route::put('/Update_user/{id}', [UserController::class, 'update'])->name('users.update'); // Update user
         Route::delete('/Delete_user/{id}', [UserController::class, 'destroy'])->name('users.destroy'); // Delete user
