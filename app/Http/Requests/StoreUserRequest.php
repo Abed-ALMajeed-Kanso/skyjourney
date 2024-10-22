@@ -3,40 +3,32 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth; // Import the Auth facade
 use Illuminate\Auth\Access\AuthorizationException;
 
-class StoreUserRequest extends FormRequest
+class UpdatePassengerRequest extends FormRequest
 {
     public function authorize()
     {
-        // Check if the user is authenticated and has the admin role
-        return Auth::check() && Auth::user()->hasRole('admin'); // Use Auth::check() for safety
-    }
-
-    protected function failedAuthorization()
-    {
-        // Throw an AuthorizationException with a custom message
-        throw new AuthorizationException('You are not authorized to perform this action.');
+        // Check if the user is authenticated and has the admin or manager role
+        if (!$this->user() || !($this->user()->hasRole('admin') || $this->user()->hasRole('manager'))) {
+            throw new AuthorizationException('You are not authorized to perform this action.');
+        }
+        
+        return true; // User is authorized
     }
 
     public function rules()
     {
-        return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:8|confirmed', // Password confirmation
-        ];
-    }
+        $passengerId = $this->route('id'); // Ensure to get the correct ID from the route
 
-    public function messages()
-    {
         return [
-            'name.required' => 'Name is required',
-            'email.required' => 'Email is required',
-            'email.unique' => 'Email must be unique',
-            'password.required' => 'Password is required',
-            'password.confirmed' => 'Passwords do not match',
+            'flight_id' => 'sometimes|required|exists:flights,id',
+            'last_name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:passengers,email,' . $passengerId,
+            'password' => 'nullable|string|min:8',
+            'dob' => 'sometimes|required|date',
+            'passport_expiry_date' => 'sometimes|required|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

@@ -3,12 +3,13 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class UpdateFlightRequest extends FormRequest
 {
     public function authorize()
     {
-        
+        // Check if the user is authenticated and has the admin or manager role
         return $this->user() && ($this->user()->hasRole('admin') || $this->user()->hasRole('manager'));
     }
 

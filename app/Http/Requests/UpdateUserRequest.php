@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth; 
 use Illuminate\Auth\Access\AuthorizationException;
 
 class UpdateUserRequest extends FormRequest
@@ -11,14 +10,9 @@ class UpdateUserRequest extends FormRequest
     public function authorize()
     {
         // Check if the user is authenticated and has the admin role
-        return Auth::check() && Auth::user()->hasRole('admin');
+        return $this->user() && $this->user()->hasRole('admin');
     }
 
-    protected function failedAuthorization()
-    {
-        // Throw an AuthorizationException with a custom message
-        throw new AuthorizationException('You are not authorized to perform this action.');
-    }
 
     public function rules()
     {

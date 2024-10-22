@@ -3,17 +3,20 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class UpdatePassengerRequest extends FormRequest
 {
     public function authorize()
     {
-        return $this->user() && ($this->user()->hasRole('admin') || $this->user()->hasRole('manager'));
+        // Use the user() method directly to check for the authenticated user
+        $user = $this->user();
+        return $user && ($user->hasRole('admin') || $user->hasRole('manager')); // Check for admin or manager role
     }
 
     public function rules()
     {
-        $passengerId = $this->route('id'); // Make sure to get the correct ID from the route
+        $passengerId = $this->route('id'); // Ensure to get the correct ID from the route
 
         return [
             'flight_id' => 'sometimes|required|exists:flights,id', 

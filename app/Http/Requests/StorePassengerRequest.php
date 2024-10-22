@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class StorePassengerRequest extends FormRequest
 {
@@ -13,8 +14,12 @@ class StorePassengerRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Only allow access if the user has the 'admin' or 'manager' role
-        return $this->user() && ($this->user()->hasRole('admin') || $this->user()->hasRole('manager'));
+        // Check if the user is authenticated and has the 'admin' or 'manager' role
+        if (!$this->user() || !($this->user()->hasRole('admin') || $this->user()->hasRole('manager'))) {
+            throw new AuthorizationException('You are not authorized to perform this action.');
+        }
+
+        return true; // User is authorized
     }
 
     /**
@@ -25,14 +30,14 @@ class StorePassengerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'flight_id' => 'required|exists:flights,id', 
+            'flight_id' => 'required|exists:flights,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:passengers,email', // Ensure email is unique in the passengers table
-            'password' => 'required|string|min:8', // Ensure password is at least 8 characters
-            'dob' => 'required|date', // Date of birth is required
-            'passport_expiry_date' => 'required|date|after:today', // Ensure passport expiry date is in the future
-            'image' => 'nullable|string', // Accept base64-encoded string for the image
+            'email' => 'required|email|unique:passengers,email',
+            'password' => 'required|string|min:8',
+            'dob' => 'required|date',
+            'passport_expiry_date' => 'required|date|after:today',
+            'image' => 'nullable|string',
         ];
     }
 }

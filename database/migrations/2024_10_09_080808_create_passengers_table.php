@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('passengers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('flight_id'); // Foreign key to flights table
+            $table->unsignedBigInteger('flight_id'); 
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();

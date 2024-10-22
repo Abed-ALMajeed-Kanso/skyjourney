@@ -29,18 +29,15 @@ class FlightController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'number' => 'required|string|max:255|unique:flights,number',
-            'departure_city' => 'required|string|max:255',
-            'arrival_city' => 'required|string|max:255',
-            'departure_time' => 'required|date',
-            'arrival_time' => 'required|date',
-        ]);
-
+        // Since StoreFlightRequest already validates, we can use the validated data directly
+        $validatedData = $request->validated();
+    
+        // Create the new flight record
         $flight = Flight::create($validatedData);
 
         return response(['success' => true, 'data' => $flight]);
     }
+    
 
     public function show(Flight $flight)
     {
@@ -68,5 +65,4 @@ class FlightController extends Controller
         $flight->delete();
         return response(['success' => true, 'data' => null], Response::HTTP_NO_CONTENT);
     }
-    
 }

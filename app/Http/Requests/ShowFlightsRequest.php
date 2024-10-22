@@ -3,13 +3,18 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class ShowFlightsRequest extends FormRequest
 {
     public function authorize()
     {
-        // Allow all authenticated admins
-        return $this->user() && ($this->user()->hasRole('viewer') || $this->user()->hasRole('manager') || $this->user()->hasRole('admin'));
+        // Check if the user is authenticated and has 'admin' or 'manager' role
+        if (!$this->user() || !($this->user()->hasRole('viewer') || $this->user()->hasRole('admin') || $this->user()->hasRole('manager'))) {
+            throw new AuthorizationException('You are not authorized to perform this action.');
+        }
+
+        return true; // User is authorized
     }
 
     public function rules()
