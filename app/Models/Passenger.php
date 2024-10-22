@@ -12,23 +12,12 @@ use Illuminate\Notifications\Notifiable;
 
 class Passenger extends Authenticatable implements Auditable
 {
-    use SoftDeletes, HasFactory, AuditableTrait, HasApiTokens, Notifiable;
+    use SoftDeletes, HasFactory, AuditableTrait, HasApiTokens, Notifiable;//why?
 
-    protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'password',
-        'dob',
-        'passport_expiry_date',
-        'image',
-        'thumbnail',
-        'updated_at', 
-    ];
+    protected $guarded = [];
 
     protected $dates = ['deleted_at'];
 
-    // Ensure that the image field can be accessed as an array
     protected $casts = [
         'image' => 'array',
     ];

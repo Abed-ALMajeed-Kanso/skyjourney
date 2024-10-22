@@ -3,36 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\Flight;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Http\Requests\ShowFlightsRequest;
-use App\Http\Requests\ShowFlightByIdRequest;
-use App\Http\Requests\ShowPassengerByFlightIdRequest;
-use App\Http\Requests\UpdateFlightRequest;
-use App\Http\Requests\StoreFlightRequest;
-
-// use App\Http\Requests\DeleteFlightRequest;
+use Illuminate\Support\Facades\Request;
 
 class FlightController extends Controller
 {
-    /**
-     * Get all flights with pagination, filtering, and sorting.
-     */
-    public function index(ShowFlightByIdRequest $request)
+    public function index(Request $request)
     {
         $flights = QueryBuilder::for(Flight::class)
-            ->allowedFilters([AllowedFilter::partial('departure_city'), AllowedFilter::partial('arrival_city')])
-            ->allowedSorts(['departure_time', 'arrival_time'])
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::exact('passenger_id'),
+                'departure_city', 
+                'arrival_city'
+            ])
+            ->with('passengers')
+            ->defaultSort('-updated_at')
+            ->allowedSorts(['number', 'departure_time', 'arrival_time', 'created_at', 'updated_at'])
             ->paginate($request->input('per_page', 10));
 
-        return response()->json($flights);
+        return response(['success' => true, 'data' => $flights]);
     }
 
-    /**
-     * Store a new flight.
-     */
-    public function store(StoreFlightRequest $request)
+    public function store(Request $request)
     {
         $validatedData = $request->validate([
             'number' => 'required|string|max:255|unique:flights,number',
@@ -44,57 +39,34 @@ class FlightController extends Controller
 
         $flight = Flight::create($validatedData);
 
-        return response()->json($flight, 201);
+        return response(['success' => true, 'data' => $flight]);
     }
 
-    /**
-     * Show a single flight.
-     */
-    public function show(ShowFlightByIdRequest $request, $id)
+    public function show(Flight $flight)
     {
-        $flight = Flight::findOrFail($id);
-        return response()->json($flight);
+        $flight->load('passengers');
+        return response(['success' => true, 'data' =>$flight]);
     }    
 
-    /**
-     * Update a flight's details.
-     */
-    public function update(UpdateFlightRequest $request, $id)
+    public function update(Request $request, Flight $flight)
     {
-        // Find the flight by ID or fail
-        $flight = Flight::findOrFail($id);
+        $validatedData = $request->validate([
+            'number' => 'required|string|max:255|unique:flights,number',
+            'departure_city' => 'required|string|max:255',
+            'arrival_city' => 'required|string|max:255',
+            'departure_time' => 'required|date',
+            'arrival_time' => 'required|date',
+        ]);
 
-        // The request is already validated by UpdateFlightRequest, so get the validated data
-        $validatedData = $request->validated();
-
-        // Update the flight with the validated data
         $flight->update($validatedData);
 
-        // Return the updated flight as a JSON response
-        return response()->json($flight);
+        return response(['success' => true, 'data' => $flight]);
     }
 
-
-    /**
-     * Delete a flight.
-     */
-    public function destroy($id)
-    {
-        $flight = Flight::findOrFail($id);
+    public function destroy(Flight $flight)
+    {    
         $flight->delete();
-    
-        return response()->json(['message' => 'Flight deleted successfully']);
-    }
-    
-
-    /**
-     * Get passengers for a specific flight.
-     */
-    public function passengers(ShowPassengerByFlightIdRequest $request, $flightId)
-    {
-        $flight = Flight::findOrFail($flightId);
-        $passengers = $flight->passengers()->paginate(10);
-        return response()->json($passengers);
+        return response(['success' => true, 'data' => null], Response::HTTP_NO_CONTENT);
     }
     
 }

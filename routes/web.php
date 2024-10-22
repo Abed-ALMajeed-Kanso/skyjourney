@@ -17,9 +17,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes requiring authentication
     Route::get('/passengers', [PassengerController::class, 'index'])->name('passengers.index'); // List passengers
-    Route::get('/passengers/{id}', [PassengerController::class, 'show'])->name('passengers.show'); // View a single passenger
+    Route::get('/passengers/{passenger}', [PassengerController::class, 'show'])->name('passengers.show'); // View a single passenger
     Route::get('/flights', [FlightController::class, 'index'])->name('flights.index'); // List flights
-    Route::get('/flights/{id}', [FlightController::class, 'show'])->name('flights.show'); // View a single flight
+    Route::get('/flights/{flight}', [FlightController::class, 'show'])->name('flights.show'); // View a single flight
     Route::get('/flights_passengers/{id}', [FlightController::class, 'passengers'])->name('flights.passengers'); // Get passengers by flight ID
 
     // Admin routes (Full access to all routes)

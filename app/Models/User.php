@@ -24,9 +24,7 @@ class User extends Authenticatable implements Auditable
     protected $fillable = [
         'name',
         'email',
-        'password',
-        'email_verified_at',  
-        'remember_token',
+        'password'
     ];
 
     /**
@@ -49,7 +47,7 @@ class User extends Authenticatable implements Auditable
         'password' => 'hashed',
     ];
 
-    public function roles(): BelongsToMany
+    public function roles()
     {
         return $this->belongsToMany(Role::class);
     }

@@ -20,3 +20,4 @@ class AddImageToPassengersTable extends Migration
         });
     }
 }
+//you can put them in the same migratio as long as u are not live

@@ -4,173 +4,132 @@ namespace App\Http\Controllers;
 
 use App\Models\Passenger;
 use Illuminate\Http\Request;
-use App\Http\Requests\ShowPassengersRequest;
-use App\Http\Requests\ShowPassengerByIdRequest;
-use App\Http\Requests\StorePassengerRequest;
-use App\Http\Requests\UpdatePassengerRequest;
-use App\Http\Requests\DeletePassengerRequest;
 use Spatie\QueryBuilder\QueryBuilder;
-use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
-use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class PassengerController extends Controller
 {
-    /**
-     * Get all passengers with pagination, filtering, and sorting.
-     */
-    public function index(ShowPassengersRequest $request): JsonResponse
+    public function index(Request $request)
     {
         $passengers = QueryBuilder::for(Passenger::class)
             ->allowedFilters([
-                AllowedFilter::partial('first_name'), 
-                AllowedFilter::partial('last_name'), 
-                AllowedFilter::partial('email')
+                // id extrac
+                // flight id exact
+                'first_name', 
+                'last_name', 
+                'email'
             ])
-            ->allowedSorts(['first_name', 'last_name', 'email'])
+            ->allowedSorts(['first_name', 'last_name', 'email', 'created_at', 'updated_at'])
             ->paginate($request->input('per_page', 10));
 
-        return response()->json($passengers);
+        return response(['success' => true, 'data' => $passengers]);
     }
 
-    /**
-     * Show a single passenger.
-     */
-    public function show(ShowPassengerByIdRequest $request, $id): JsonResponse
+    public function show(Passenger $passenger)
     {
-        $passenger = Passenger::findOrFail($id);
-        return response()->json($passenger);
+        return response(['success' => true, 'data' => $passenger]);
     }
 
-    /**
-     * Store a new passenger.
-     */
-    public function store(StorePassengerRequest $request): JsonResponse
-    {
-        // The validation is already handled by StorePassengerRequest, so no need to validate again.
+    public function store(Request $request)
+    {        
+        $validatedData = $request->validate([
+            'flight_id' => 'sometimes|required|exists:flights,id',
+            'last_name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:passengers,email',
+            'password' => 'nullable|string|min:8',
+            'dob' => 'sometimes|required|date',
+            'passport_expiry_date' => 'sometimes|required|date',
+        ]);
+
+        // ht validition hun w kel shi requests class mahihun
         $validatedData = $request->validated();
     
-        // Handle image upload if present in JSON
+        //here badel ma tht kel shi bel code u should do a filetrait, btht fi your methods w btestaamlo hun
         if (isset($validatedData['image'])) {
-            // Decode the base64 image
             $imageData = $validatedData['image'];
             $image = str_replace('data:image/jpeg;base64,', '', $imageData);
             $image = str_replace(' ', '+', $image);
             $originalImage = base64_decode($image);
     
-            // Store the original image locally
             $originalImageName = time() . '_image.jpg';
             $originalImagePath = 'uploads/Images/original/' . $originalImageName;
             Storage::disk('public')->put($originalImagePath, $originalImage);
     
-            // Create a thumbnail and store it on S3
-            $thumbnailImage = Image::make($originalImage)->resize(150, 150)->encode('jpg');
+            $thumbnailImage = Image::make($originalImage)->resize(150, 150)->encode('jpg');//l package mestaamela ghalat w akid mana meshye eendak, should check the docs instead of using chatgpt
             $thumbnailImageName = time() . '_thumb.jpg';
             $thumbnailPath = 'uploads/Images/thumbnails/' . $thumbnailImageName;
-            Storage::disk('s3')->put($thumbnailPath, (string) $thumbnailImage);
+            Storage::disk('s3')->put($thumbnailPath, (string) $thumbnailImage);//??
     
-            // Store the paths in the database
-            $validatedData['image'] = $originalImagePath; // Local storage path
-            $validatedData['thumbnail'] = Storage::disk('s3')->url($thumbnailPath); // S3 URL
+            $validatedData['image'] = $originalImagePath;
+            $validatedData['thumbnail'] = Storage::disk('s3')->url($thumbnailPath);
         }
     
-        // Hash the password before saving
-        $validatedData['password'] = bcrypt($validatedData['password']);
+        $validatedData['password'] = bcrypt($validatedData['password']);//dont have password
     
-        // Add timestamps explicitly (optional, Laravel should handle it automatically)
-        $validatedData['created_at'] = now();
-        $validatedData['updated_at'] = now();
-    
-        // Create a new passenger record
         $passenger = Passenger::create($validatedData);
     
-        return response()->json($passenger, 201);
+        return response(['success' => true, 'data' => $passenger]);
     }
     
-    
-
-
-    /**
-     * Update a passenger's details.
-     */
-    public function update(UpdatePassengerRequest $request, $id)
+    public function update(Request $request, Passenger $passenger)
     {
-        $passenger = Passenger::findOrFail($id); // Make sure the ID is correct
-    
-        // Validate the incoming JSON data
         $validatedData = $request->validate([
             'flight_id' => 'sometimes|required|exists:flights,id',
             'last_name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:passengers,email,' . $id,
+            'email' => 'sometimes|required|email|unique:passengers,email',//here l unique rule ghalat
             'password' => 'nullable|string|min:8',
             'dob' => 'sometimes|required|date',
             'passport_expiry_date' => 'sometimes|required|date',
         ]);
     
-        // Handle image upload if present in JSON
         if ($request->has('image')) {
-            // Optionally delete old images if needed
             if ($passenger->image) {
-                Storage::disk('public')->delete($passenger->image); // Delete local image
+                Storage::disk('public')->delete($passenger->image);
             }
             if ($passenger->thumbnail) {
-                Storage::disk('s3')->delete(parse_url($passenger->thumbnail, PHP_URL_PATH)); // Delete thumbnail from S3
+                Storage::disk('s3')->delete(parse_url($passenger->thumbnail, PHP_URL_PATH));
             }
     
-            // Decode the base64 image
-            $imageData = $request->input('image'); // Assuming the image comes as base64
+            $imageData = $request->input('image');
             $image = str_replace('data:image/jpeg;base64,', '', $imageData);
             $image = str_replace(' ', '+', $image);
             $originalImage = base64_decode($image);
     
-            // Store the original image locally
             $originalImageName = time() . '_image.jpg';
             $originalImagePath = 'uploads/Images/original/' . $originalImageName;
             Storage::disk('public')->put($originalImagePath, $originalImage);
     
-            // Create a thumbnail and store it on S3
             $thumbnailImage = Image::make($originalImage)->resize(150, 150)->encode('jpg');
             $thumbnailImageName = time() . '_thumb.jpg';
             $thumbnailPath = 'uploads/Images/thumbnails/' . $thumbnailImageName;
             Storage::disk('s3')->put($thumbnailPath, (string) $thumbnailImage);
     
-            // Store the new image paths in the database
-            $validatedData['image'] = $originalImagePath; // Local storage path
-            $validatedData['thumbnail'] = Storage::disk('s3')->url($thumbnailPath); // S3 URL
+            $validatedData['image'] = $originalImagePath;
+            $validatedData['thumbnail'] = Storage::disk('s3')->url($thumbnailPath);
         }
-    
-        // Hash the password if provided
+        
         if ($request->filled('password')) {
             $validatedData['password'] = bcrypt($request->input('password'));
         }
     
-        // Update the passenger record
         $passenger->update($validatedData);
     
-        return response()->json($passenger, 200); // Returning updated passenger data with a 200 status
+        return response(['success' => true, 'data' => $passenger]);
     }
 
-
-
-    /**
-     * Delete a passenger.
-     */
-    public function destroy($id)
+    public function destroy(Passenger $passenger)
     {
-        $passenger = Passenger::findOrFail($id);
-        
-        // Delete images from storage
         if ($passenger->image) {
-            Storage::disk('public')->delete($passenger->image); // Delete local image
+            Storage::disk('public')->delete($passenger->image);
         }
         if ($passenger->thumbnail) {
-            Storage::disk('s3')->delete(parse_url($passenger->thumbnail, PHP_URL_PATH)); // Delete thumbnail from S3
+            Storage::disk('s3')->delete(parse_url($passenger->thumbnail, PHP_URL_PATH));//???
         }
 
         $passenger->delete();
 
-        return response()->json(['message' => 'Passenger deleted successfully']);
+        return response(['success' => true, 'data' => null], Response::HTTP_NO_CONTENT);    
     }
 }
