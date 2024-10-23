@@ -6,11 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateAuditsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+
     public function up()
     {
         $connection = config('audit.drivers.database.connection', config('database.default'));
@@ -37,11 +33,6 @@ class CreateAuditsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         $connection = config('audit.drivers.database.connection', config('database.default'));

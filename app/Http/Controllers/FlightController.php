@@ -24,40 +24,45 @@ class FlightController extends Controller
             ->allowedSorts(['number', 'departure_time', 'arrival_time', 'created_at', 'updated_at'])
             ->paginate($request->input('per_page', 10));
 
-        return response(['success' => true, 'data' => $flights]);
+        return response(['success' => true, 'data' => $flights], Response::HTTP_OK);
     }
 
     public function store(Request $request)
     {
-        // Since StoreFlightRequest already validates, we can use the validated data directly
-        $validatedData = $request->validated();
-    
-        // Create the new flight record
-        $flight = Flight::create($validatedData);
+        $validatedData = $request->validate([
+            'number' => 'required|string|max:255|unique:flights', 
+            'departure_city' => 'required|string|max:255',
+            'arrival_city' => 'required|string|max:255',
+            'departure_time' => 'required|date|after_or_equal:now', 
+            'arrival_time' => 'required|date|after:departure_time', 
+        ]);
 
-        return response(['success' => true, 'data' => $flight]);
+        $validatedData['created_at'] = now();
+        $validatedData['updated_at'] = now();    
+        $flight = Flight::create($validatedData);
+        
+        return response(['success' => true, 'data' => $flight], Response::HTTP_CREATED);
     }
     
-
     public function show(Flight $flight)
     {
-        $flight->load('passengers');
         return response(['success' => true, 'data' =>$flight]);
     }    
 
     public function update(Request $request, Flight $flight)
     {
         $validatedData = $request->validate([
-            'number' => 'required|string|max:255|unique:flights,number',
+            'number' => 'required|string|max:255|unique:flights,' . $flight->id,
             'departure_city' => 'required|string|max:255',
             'arrival_city' => 'required|string|max:255',
-            'departure_time' => 'required|date',
-            'arrival_time' => 'required|date',
+            'departure_time' => 'required|date|after_or_equal:now', 
+            'arrival_time' => 'required|date|after:departure_time',
         ]);
 
+        $validatedData['updated_at'] = now();
         $flight->update($validatedData);
 
-        return response(['success' => true, 'data' => $flight]);
+        return response(['success' => true, 'data' => $flight], Response::HTTP_OK);
     }
 
     public function destroy(Flight $flight)

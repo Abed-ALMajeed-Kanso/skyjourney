@@ -18,10 +18,11 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('image');
             $table->date('dob');
             $table->date('passport_expiry_date');
             $table->timestamps();
-            $table->softDeletes(); // Add soft delete
+            $table->softDeletes(); 
         
             $table->foreign('flight_id')->references('id')->on('flights')->onDelete('cascade');
         });

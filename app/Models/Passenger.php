@@ -7,12 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use OwenIt\Auditing\Contracts\Auditable; 
 use OwenIt\Auditing\Auditable as AuditableTrait; 
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable; 
 
 class Passenger extends Authenticatable implements Auditable
 {
-    use SoftDeletes, HasFactory, AuditableTrait, HasApiTokens, Notifiable;//why?
+    use SoftDeletes, HasFactory, AuditableTrait, Notifiable;
 
     protected $guarded = [];
 

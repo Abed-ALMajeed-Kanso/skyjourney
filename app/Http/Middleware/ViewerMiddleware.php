@@ -4,23 +4,20 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
-class ViewerMiddleware
+class ManagerMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
-        // Check if the user is authenticated and has the 'viewer' role
-        if (Auth::check() && Auth::user()->hasRole('viewer')) {
-            return $next($request); // Allow access
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->hasRole('admin') || $user->hasRole('manager') || $user->hasRole('viewer')) {
+                return $next($request);
+            }
         }
 
-        return response()->json(['message' => 'Forbidden'], 403); // Deny access
+        return response(['success' => false, 'message' => 'Forbidden'], Response::HTTP_FORBIDDEN);
     }
 }
