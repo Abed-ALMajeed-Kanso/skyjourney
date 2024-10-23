@@ -8,12 +8,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait; 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;  
+use Spatie\Permission\Traits\HasRoles; 
 
 class User extends Authenticatable implements Auditable 
 {
-    use HasApiTokens, HasFactory, Notifiable, AuditableTrait, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, AuditableTrait, SoftDeletes, HasRoles;
 
     protected $fillable = [
         'name',
@@ -31,14 +31,8 @@ class User extends Authenticatable implements Auditable
         'password' => 'hashed',
     ];
 
-    public function roles()
+    public function role()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsTo(Role::class);
     }
-
-    public function hasRole($role)
-    {
-        return $this->roles()->where('name', $role)->exists();
-    }
-
 }

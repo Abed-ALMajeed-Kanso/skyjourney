@@ -7,22 +7,12 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Spatie\Permission\Models\Role;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password = null;
-
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    
     public function definition(): array
     {
         return [
@@ -34,26 +24,14 @@ class UserFactory extends Factory
         ];
     }
 
-    /**
-     * After creating a user, attach the specified role with timestamps.
-     */
     public function configure()
     {
         return $this->afterCreating(function (User $user) {
-            $roleId = 3; // Specify the role_id you want to assign
-            $now = Carbon::now(); // Get the current time
-
-            // Attach the role with created_at and updated_at timestamps
-            $user->roles()->attach($roleId, [
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
+            $role = Role::find(1); // change ID to change role
+            $user->assignRole($role);
         });
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
