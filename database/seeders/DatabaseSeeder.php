@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
 
       // Create 50 flights using the factory
       // Flight::factory()->count(50)->create();       
-       Flight::factory()->count(1)->create();    
+      // Flight::factory()->count(8)->create();    
 
       // Create 1000 passengers using the factory
       // Passenger::factory()->count(1000)->create();  
@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
       // and errors in relational data occured
 
       // User Samples for Excel import
-      // User::factory()->count(1)->create();
+      // User::factory()->count(8)->create();
 
       // Note: roles were added to the Databse manually by
       // the following SQL statements:

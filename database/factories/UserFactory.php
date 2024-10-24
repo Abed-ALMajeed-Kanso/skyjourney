@@ -27,7 +27,7 @@ class UserFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (User $user) {
-            $role = Role::find(1); // change ID to change role
+            $role = Role::find(1); 
             $user->assignRole($role);
         });
     }

@@ -12,10 +12,13 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Http\Response;
+use Spatie\Permission\Models\Role;
+
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
-    public function index(ShowUsersRequest $request)
+    public function index(Request $request)
     {
         $users = QueryBuilder::for(User::class)
             ->allowedFilters([
@@ -30,7 +33,7 @@ class UserController extends Controller
             return response(['success' => true, 'data' => $users], Response::HTTP_OK);
     }
     
-    public function show(Request $request, $id)
+    public function show(User $user)
     {
         return response(['success' => true, 'data' => $user], Response::HTTP_OK);
     }
@@ -41,33 +44,44 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users', 
             'password' => 'required|string|min:8|confirmed', 
+            'role_id' => 'required|integer|exists:roles,id',
         ]);
-    
+
         $validatedData['password'] = Hash::make($validatedData['password']);
         $validatedData['created_at'] = now();
         $validatedData['updated_at'] = now();    
+
         $user = User::create($validatedData);
-    
+        $role = Role::find($request->role_id);    
+        $user->assignRole($role);
+        
         return response(['success' => true, 'data' => $user], Response::HTTP_CREATED);
     }
+
     
     
     public function update(Request $request, User $user)
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|uunique:users,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed', 
+            'email' => 'required|email|unique:users,email,' . $user->id, 
+            'password' => 'nullable|string|min:8|confirmed',
+            'role_id' => 'nullable|integer|exists:roles,id', 
         ]);
 
         if (isset($validatedData['password'])) {
             $validatedData['password'] = Hash::make($validatedData['password']);
         } else {
-            unset($validatedData['password']);
+            unset($validatedData['password']); 
         }
 
         $validatedData['updated_at'] = now();
         $user->update($validatedData);
+
+        if (isset($request->role_id)) {
+            $role = Role::find($request->role_id);
+            $user->syncRoles([$role->name]); 
+        }
 
         return response(['success' => true, 'data' => $user], Response::HTTP_OK);
     }

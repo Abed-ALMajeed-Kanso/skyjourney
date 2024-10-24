@@ -27,6 +27,17 @@ class FlightController extends Controller
         return response(['success' => true, 'data' => $flights], Response::HTTP_OK);
     }
 
+    public function show(Flight $flight)
+    {
+        return response(['success' => true, 'data' => $flight], Response::HTTP_OK);
+    }  
+
+    public function passengers(Flight $flight)
+    {
+        return response(['success' => true, 'data' => $flight->passengers], Response::HTTP_OK);
+    }
+    
+
     public function store(Request $request) 
     {
         $validatedData = $request->validate([
@@ -43,11 +54,6 @@ class FlightController extends Controller
 
         return response(['success' => true, 'data' => $flight], Response::HTTP_CREATED);
     }
-
-    public function show(Flight $flight)
-    {
-        return response(['success' => true, 'data' => $flight], Response::HTTP_OK);
-    }    
 
     public function update(Request $request, Flight $flight)
     {

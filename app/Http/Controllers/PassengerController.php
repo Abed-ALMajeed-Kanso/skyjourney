@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
-
 use App\Models\Passenger;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -47,8 +45,8 @@ class PassengerController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:passengers',
             'password' => 'nullable|string|min:8',
-            'dob' => 'required|date',
-            'passport_expiry_date' => 'required|date',
+            'dob' => 'required|date_format:Y-m-d H:i:s',
+            'passport_expiry_date' => 'required|date_format:Y-m-d H:i:s',
         ]);
     
         if ($request->has('image')) {
