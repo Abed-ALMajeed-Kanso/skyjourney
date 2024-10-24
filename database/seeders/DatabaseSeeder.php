@@ -22,11 +22,9 @@ class DatabaseSeeder extends Seeder
 
   
       // large data samples can be seeded but it take time 
-      // and errors in relational data occured
 
       // User Samples for Excel import
       // User::factory()->count(8)->create();
-
 
       // To test the functionality of the reminder email
       // I changed the deparature time of one of the flights 
@@ -35,15 +33,6 @@ class DatabaseSeeder extends Seeder
       // after I also generated an app password of my personel email
       // and set it in the .env file and I runned: php artisan flights:send-reminders
       
-      // Auditing was applied for Users, Flights, and Passengers Tables.
-
-      // since only API testing was performed not blades, all APIs were
-      // listed in the VerifyCsrfToken in the protected array to be avoided.
-
-      // S3 was not used and images were stored locally in the 
-      // storage/app/uploads directory (also the excel file is their)
-      // only testing the image was with a form.
-
       // Security headers and Sanitize Input are middlewares added in the kernel.
       
     }
