@@ -57,8 +57,10 @@ class DatabaseSeeder extends Seeder
 
 
   /*INSERT INTO roles (name, guard_name, created_at, updated_at) VALUES 
-      ('admin', 'web', NOW(), NOW()),  
-      ('viewer', 'web', NOW(), NOW());
+      ('admin', 'api', NOW(), NOW()),  
+      ('viewer', 'api', NOW(), NOW())
+      ('admin', 'sanctum', NOW(), NOW()),  
+      ('viewer', 'sanctum', NOW(), NOW());
       
       Permissions for Users
       INSERT INTO permissions (name, guard_name, created_at, updated_at) VALUES 
