@@ -45,11 +45,11 @@ class PassengerController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:passengers',
             'password' => 'nullable|string|min:8',
-            'dob' => 'required|date_format:Y-m-d H:i:s',
-            'passport_expiry_date' => 'required|date_format:Y-m-d H:i:s',
+            'dob' => 'required|date',
+            'passport_expiry_date' => 'required|date',
         ]);
     
-        if ($request->has('image')) {
+        if ($request->has('image')) { 
             $validatedData['image'] = $this->storeImage($request->input('image'));
         }
     
@@ -66,7 +66,7 @@ class PassengerController extends Controller
             'flight_id' => 'required|exists:flights,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:passengers',
+            'email' => 'required|email|unique:passengers,email,' . $passenger->id,
             'password' => 'nullable|string|min:8',
             'dob' => 'required|date',
             'passport_expiry_date' => 'required|date',

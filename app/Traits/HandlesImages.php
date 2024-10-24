@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
 
 trait HandlesImages
 {
@@ -23,7 +24,17 @@ trait HandlesImages
         $thumbnailImage = $originalImage; 
         $thumbnailPath =  $thumbnailImageName;
         Storage::disk('s3')->put($thumbnailPath, (string) $thumbnailImage); 
+
+        // sleep(3);
         
+        // $manager = new ImageManager();
+        // $thumbnailImageName = time() . '_thumb.jpg';
+        
+        // $thumbnailImage = $manager->make($originalImage);
+        // $thumbnailImage->resize(150, 150);
+
+        // $thumbnailPath = 'uploads/Images/thumbnails/' . $thumbnailImageName; 
+
         return Storage::disk('s3')->url($thumbnailPath);
     }
 }
