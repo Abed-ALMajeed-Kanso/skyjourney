@@ -14,14 +14,14 @@ class PassengerFactory extends Factory
     public function definition(): array
     {
         return [
-            'flight_id' => Flight::factory(), 
+            'flight_id' => Flight::inRandomOrder()->first()->id ?? Flight::factory(), 
             'first_name' => $this->faker->firstName, 
             'last_name' => $this->faker->lastName,    
             'email' => $this->faker->unique()->safeEmail,  
             'password' => Hash::make('password'),    
             'dob' => $this->faker->date(),          
             'passport_expiry_date' => $this->faker->date(),  
-            'image' => 'https://skyjourney-images.s3.eu-north-1.amazonaws.com/' . $this->faker->unique()->word . '.jpg', 
+            'image' => 'https://skyjourney-images.s3.eu-north-1.amazonaws.com/images/thumbnails/Standard.jpg', 
         ];
     }
 }

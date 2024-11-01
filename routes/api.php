@@ -28,7 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/import_users', [UserController::class, 'import'])->name('users.import');
 
         Route::post('/Create_passenger', [PassengerController::class, 'store'])->name('passengers.store');
-        Route::put('/Update_passenger/{passenger}', [PassengerController::class, 'update'])->name('passengers.update');
+        // Route::put('/Update_passenger/{passenger}', [PassengerController::class, 'update'])->name('passengers.update');
+        // since I am working with form-data to upload a file in postman and a put request, it did not work  
+        // so I used post to test the code
+        Route::post('/Update_passenger/{passenger}', [PassengerController::class, 'update'])->name('passengers.update');
         Route::delete('/Delete_passenger/{passenger}', [PassengerController::class, 'destroy'])->name('passengers.destroy');
 
         Route::post('/Create_flight', [FlightController::class, 'store'])->name('flights.store');

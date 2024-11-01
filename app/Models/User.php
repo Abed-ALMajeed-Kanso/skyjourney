@@ -31,8 +31,4 @@ class User extends Authenticatable implements Auditable
         'password' => 'hashed',
     ];
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
 }

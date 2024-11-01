@@ -12,19 +12,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-      // Create 50 flights using the factory
       // Flight::factory()->count(50)->create();       
-      // Flight::factory()->count(8)->create();    
+      // Flight::factory()->count(1)->create();    
 
-      // Create 1000 passengers using the factory
-      // Passenger::factory()->count(1000)->create();  
+      // Passenger::factory()->count(1)->create();  
       // Passenger::factory()->count(5)->create();
 
-  
       // large data samples can be seeded but it take time 
 
       // User Samples for Excel import
-      // User::factory()->count(8)->create();
+      // User::factory()->count(10)->create();
 
       // To test the functionality of the reminder email
       // I changed the deparature time of one of the flights 
@@ -32,8 +29,6 @@ class DatabaseSeeder extends Seeder
       // I changed the email of the passenger to my personel email
       // after I also generated an app password of my personel email
       // and set it in the .env file and I runned: php artisan flights:send-reminders
-      
-      // Security headers and Sanitize Input are middlewares added in the kernel.
       
     }
 }

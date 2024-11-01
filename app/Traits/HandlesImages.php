@@ -2,39 +2,60 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManagerStatic as Image;
+use Storage;
 use Intervention\Image\ImageManager;
+use Aws\S3\S3Client;
+use Intervention\Image\Drivers\Gd\Driver;
+
 
 trait HandlesImages
 {
     public function storeImage($imageData)
     {
+        $this->validate(request(), [
+            'image' => 'required|image|mimes:jpg,jpeg,png,gif,svg|max:5120',
+        ]);
 
-        $image = str_replace('data:image/jpeg;base64,', '', $imageData);
-        $image = str_replace(' ', '+', $image);
-        $originalImage = base64_decode($image);
+        $uploadedFile = $imageData;
+        $originalImageName = time() . '_' . $uploadedFile->getClientOriginalName();
+        Storage::disk('public')->putFileAs('uploads/images/original', $uploadedFile, $originalImageName);
 
-        $originalImageName = time() . '_image.jpg';
-        $originalImagePath = 'uploads/Images/original/' . $originalImageName;
-        Storage::disk('public')->put($originalImagePath, $originalImage);
+        $manager = new ImageManager(new Driver());
+        $thumbnail = $manager->read(storage_path('app/public/uploads/images/original/' . $originalImageName));
         
-        $thumbnailImageName = time() . '_thumb.jpg';
-        // $thumbnailImage = Image::make($originalImage)->resize(150, 150)->encode('jpg');
-        $thumbnailImage = $originalImage; 
-        $thumbnailPath =  $thumbnailImageName;
-        Storage::disk('s3')->put($thumbnailPath, (string) $thumbnailImage); 
-
-        // sleep(3);
+        $thumbnail->resize(375, 250); 
         
-        // $manager = new ImageManager();
-        // $thumbnailImageName = time() . '_thumb.jpg';
-        
-        // $thumbnailImage = $manager->make($originalImage);
-        // $thumbnailImage->resize(150, 150);
+        // $thumbnail->resize(400, null, function ($constraint) {
+        //     $constraint->aspectRatio();
+        //     $constraint->upsize(); 
+        // });
+        // resizing in other method with other ratio
 
-        // $thumbnailPath = 'uploads/Images/thumbnails/' . $thumbnailImageName; 
+        $s3Client = new S3Client([
+            'region' => env('AWS_DEFAULT_REGION'),
+            'version' => 'latest',
+            'credentials' => [
+                'key' => env('AWS_ACCESS_KEY_ID'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            ],
+        ]);
 
-        return Storage::disk('s3')->url($thumbnailPath);
+        $thumbnailStream = fopen('php://temp', 'r+'); 
+        $thumbnail->encode(); 
+        fwrite($thumbnailStream, (string) $thumbnail->encode());
+        rewind($thumbnailStream); 
+
+        $result = $s3Client->putObject([
+            'Bucket' => env('AWS_BUCKET'),
+            'Key' => 'images/thumbnails/' . $originalImageName,
+            'Body' => $thumbnailStream,
+            'ContentType' => 'image/jpeg', 
+        ]);
+
+        fclose($thumbnailStream);
+        return $result['ObjectURL'];
     }
 }
+
+    

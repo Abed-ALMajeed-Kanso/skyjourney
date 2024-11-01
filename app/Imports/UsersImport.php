@@ -19,6 +19,7 @@ class UsersImport implements ToModel
             'remember_token' => $row[5],
             'created_at' => $row[6] ? \Carbon\Carbon::parse($row[6]) : null, 
             'updated_at' => $row[7] ? \Carbon\Carbon::parse($row[7]) : null, 
+            'email' => $row[8],
         ]);
     }
 }

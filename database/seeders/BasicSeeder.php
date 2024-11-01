@@ -2,16 +2,20 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class DatabaseSeeder extends Seeder
+class BasicSeeder extends Seeder
 {
     public function run()
     {
+        // make sure admin the fisrt admin with api gaurd have id 1 
+        // and the first viewer of api gaurd have id 2
+
         Role::insert([
             ['name' => 'admin', 'guard_name' => 'api', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'viewer', 'guard_name' => 'api', 'created_at' => now(), 'updated_at' => now()],

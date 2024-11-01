@@ -11,10 +11,11 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Traits\HandlesImages;
+use App\Traits\DeletePassengerImage;
 
 class PassengerController extends Controller
 {
-    use HandlesImages;
+    use HandlesImages, DeletePassengerImage;
     public function index(Request $request)
     {
         $passengers = QueryBuilder::for(Passenger::class)
@@ -49,53 +50,47 @@ class PassengerController extends Controller
             'passport_expiry_date' => 'required|date',
         ]);
     
-        if ($request->has('image')) { 
-            $validatedData['image'] = $this->storeImage($request->input('image'));
+        if ($request->hasFile('image')) { 
+            $validatedData['image'] = $this->storeImage($request->file('image'));
         }
-    
+
         $validatedData['password'] = Hash::make($validatedData['password']);
         $passenger = Passenger::create($validatedData);
     
         return response(['success' => true, 'data' => $passenger], Response::HTTP_CREATED);
     }
     
-    
     public function update(Request $request, Passenger $passenger)
     {
         $validatedData = $request->validate([
             'flight_id' => 'required|exists:flights,id',
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'last_name'=> 'required|string|max:255',
             'email' => 'required|email|unique:passengers,email,' . $passenger->id,
             'password' => 'nullable|string|min:8',
             'dob' => 'required|date',
             'passport_expiry_date' => 'required|date',
         ]);
-    
-        if ($request->has('image')) {
-            $validatedData['image'] = $this->storeImage($request->input('image'));
+
+        if ($request->hasFile('image')) { 
+            if ($passenger->image)
+                $this->deleteImage($passenger);
+             $validatedData['image'] = $this->storeImage($request->file('image'));
         }
         
         if ($request->filled('password')) {
             $validatedData['password'] = Hash::make($validatedData['password']);
         }
-    
+
         $passenger->update($validatedData);
-    
+
         return response(['success' => true, 'data' => $passenger], Response::HTTP_OK);
     }
 
     public function destroy(Passenger $passenger)
     {
-        if ($passenger->image) {
-            $imagePath = parse_url($passenger->image, PHP_URL_PATH);
-            Storage::disk('s3')->delete(ltrim($imagePath, '/'));
-        }
-    
         $passenger->delete();
-    
         return response(['success' => true, 'data' => null], Response::HTTP_NO_CONTENT);
     }
-    
-    
+
 }

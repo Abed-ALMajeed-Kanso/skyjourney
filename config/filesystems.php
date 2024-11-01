@@ -50,9 +50,13 @@ return [
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
             'region' => env('AWS_DEFAULT_REGION'),
             'bucket' => env('AWS_BUCKET'),
+            'visibility' => 'public', 
+            'options' => [
+                'debug' => true,
+            ],
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
-            'storage_class' => 'STANDARD',
+            'scheme'  => 'http',
         ],
 
     ],
