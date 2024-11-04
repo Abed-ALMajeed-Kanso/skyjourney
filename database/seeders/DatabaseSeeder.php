@@ -13,15 +13,15 @@ class DatabaseSeeder extends Seeder
     {
 
       // Flight::factory()->count(50)->create();       
-      // Flight::factory()->count(1)->create();    
+      Flight::factory()->count(10)->create();    
 
-      // Passenger::factory()->count(1)->create();  
-      // Passenger::factory()->count(5)->create();
+      // Passenger::factory()->count(1000)->create();  
+      Passenger::factory()->count(5)->create();
 
       // large data samples can be seeded but it take time 
 
       // User Samples for Excel import
-      // User::factory()->count(10)->create();
+      User::factory()->count(10)->create();
 
       // To test the functionality of the reminder email
       // I changed the deparature time of one of the flights 
