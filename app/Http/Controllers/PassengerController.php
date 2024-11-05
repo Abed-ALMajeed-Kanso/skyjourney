@@ -15,6 +15,7 @@ use App\Traits\DeletePassengerImage;
 
 class PassengerController extends Controller
 {
+    // htun maa baed
     use HandlesImages, DeletePassengerImage;
     public function index(Request $request)
     {
@@ -78,6 +79,7 @@ class PassengerController extends Controller
              $validatedData['image'] = $this->storeImage($request->file('image'));
         }
         
+        // ma fi password lal passenger
         if ($request->filled('password')) {
             $validatedData['password'] = Hash::make($validatedData['password']);
         }

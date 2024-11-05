@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Flight extends Model implements Auditable 
 {
+    //la shu aayzinun?
     use HasFactory, AuditableTrait, HasApiTokens;
 
     protected $guarded = [];

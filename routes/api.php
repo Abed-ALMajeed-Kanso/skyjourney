@@ -11,7 +11,7 @@ use App\Http\Controllers\SessionController;
 Route::post('/login', [SessionController::class, 'login'])->name('login'); 
 
 Route::middleware('auth:sanctum')->group(function () {
-    
+    //routes ghalat
     Route::get('/passengers', [PassengerController::class, 'index'])->name('passengers.index'); 
     Route::get('/passengers/{passenger}', [PassengerController::class, 'show'])->name('passengers.show'); 
     Route::get('/flights', [FlightController::class, 'index'])->name('flights.index');

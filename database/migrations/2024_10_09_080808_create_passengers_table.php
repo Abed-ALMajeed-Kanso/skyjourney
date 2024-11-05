@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
+            //no password, just user have password. zabit l controller w l model also
             $table->string('password');
             $table->string('image');
             $table->date('dob');

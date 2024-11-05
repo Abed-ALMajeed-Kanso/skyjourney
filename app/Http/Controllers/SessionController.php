@@ -8,6 +8,7 @@ use App\Models\User;
 
 class SessionController extends Controller
 {
+    //add register
     public function login(Request $request)
     {
         $request->validate([

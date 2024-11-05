@@ -15,6 +15,7 @@ class Passenger extends Authenticatable implements Auditable
 
     protected $guarded = [];
 
+    //use guarded instead of fillable
     protected $fillable = [
         'flight_id',
         'first_name',

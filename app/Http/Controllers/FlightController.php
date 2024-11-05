@@ -32,10 +32,10 @@ class FlightController extends Controller
         return response(['success' => true, 'data' => $flight], Response::HTTP_OK);
     }  
 
-    public function passengers(Flight $flight)
-    {
-        return response(['success' => true, 'data' => $flight->passengers], Response::HTTP_OK);
-    }
+    // public function passengers(Flight $flight)
+    // {
+    //     return response(['success' => true, 'data' => $flight->passengers], Response::HTTP_OK);
+    // }
     
 
     public function store(Request $request) 
@@ -48,8 +48,8 @@ class FlightController extends Controller
             'arrival_time' => 'required|date_format:Y-m-d H:i:s|after:departure_time', 
         ]);
     
-        $validatedData['created_at'] = now();
-        $validatedData['updated_at'] = now();
+        // $validatedData['created_at'] = now();
+        // $validatedData['updated_at'] = now();
         $flight = Flight::create($validatedData);
 
         return response(['success' => true, 'data' => $flight], Response::HTTP_CREATED);
@@ -65,7 +65,7 @@ class FlightController extends Controller
             'arrival_time' => 'required|date_format:Y-m-d H:i:s|after:departure_time', 
         ]);
 
-        $validatedData['updated_at'] = now();
+        // $validatedData['updated_at'] = now();
         $flight->update($validatedData);
 
         return response(['success' => true, 'data' => $flight], Response::HTTP_OK);
