@@ -21,6 +21,7 @@ class BasicSeeder extends Seeder
             ['name' => 'viewer', 'guard_name' => 'api', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'admin', 'guard_name' => 'sanctum', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'viewer', 'guard_name' => 'sanctum', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'viewer', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         Permission::insert([

@@ -48,8 +48,6 @@ class UserController extends Controller
         ]);
 
         $validatedData['password'] = Hash::make($validatedData['password']);
-        $validatedData['created_at'] = now();
-        $validatedData['updated_at'] = now();    
 
         $user = User::create($validatedData);
         $role = Role::find($request->role_id);    
@@ -58,8 +56,6 @@ class UserController extends Controller
         return response(['success' => true, 'data' => $user], Response::HTTP_CREATED);
     }
 
-    
-    
     public function update(Request $request, User $user)
     {
         $validatedData = $request->validate([
@@ -75,7 +71,6 @@ class UserController extends Controller
             unset($validatedData['password']); 
         }
 
-        $validatedData['updated_at'] = now();
         $user->update($validatedData);
 
         if (isset($request->role_id)) {

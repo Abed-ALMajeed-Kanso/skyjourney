@@ -56,6 +56,34 @@ trait HandlesImages
         fclose($thumbnailStream);
         return $result['ObjectURL'];
     }
+    public function deleteImage($passenger)
+    {
+        if ($passenger->image) {
+            $s3Client = new S3Client([
+                'region' => env('AWS_DEFAULT_REGION'),
+                'version' => 'latest',
+                'credentials' => [
+                    'key' => env('AWS_ACCESS_KEY_ID'),
+                    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+                ],
+            ]);
+    
+            $imageKey = str_replace(env('AWS_URL'), '', $passenger->image);
+    
+            $s3Client->headObject([
+                'Bucket' => env('AWS_BUCKET'),
+                'Key' => $imageKey,
+            ]);
+    
+            $s3Client->deleteObject([
+                'Bucket' => env('AWS_BUCKET'),
+                'Key' => $imageKey,
+            ]);
+    
+            $passenger->image = '';
+            $passenger->save();
+        }
+    }    
 }
 
     

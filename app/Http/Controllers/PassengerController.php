@@ -11,12 +11,10 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Traits\HandlesImages;
-use App\Traits\DeletePassengerImage;
 
 class PassengerController extends Controller
 {
-    // htun maa baed
-    use HandlesImages, DeletePassengerImage;
+    use HandlesImages;
     public function index(Request $request)
     {
         $passengers = QueryBuilder::for(Passenger::class)
@@ -46,7 +44,6 @@ class PassengerController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:passengers',
-            'password' => 'nullable|string|min:8',
             'dob' => 'required|date',
             'passport_expiry_date' => 'required|date',
         ]);
@@ -55,7 +52,6 @@ class PassengerController extends Controller
             $validatedData['image'] = $this->storeImage($request->file('image'));
         }
 
-        $validatedData['password'] = Hash::make($validatedData['password']);
         $passenger = Passenger::create($validatedData);
     
         return response(['success' => true, 'data' => $passenger], Response::HTTP_CREATED);
@@ -68,7 +64,6 @@ class PassengerController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name'=> 'required|string|max:255',
             'email' => 'required|email|unique:passengers,email,' . $passenger->id,
-            'password' => 'nullable|string|min:8',
             'dob' => 'required|date',
             'passport_expiry_date' => 'required|date',
         ]);
@@ -79,11 +74,6 @@ class PassengerController extends Controller
              $validatedData['image'] = $this->storeImage($request->file('image'));
         }
         
-        // ma fi password lal passenger
-        if ($request->filled('password')) {
-            $validatedData['password'] = Hash::make($validatedData['password']);
-        }
-
         $passenger->update($validatedData);
 
         return response(['success' => true, 'data' => $passenger], Response::HTTP_OK);
@@ -94,5 +84,4 @@ class PassengerController extends Controller
         $passenger->delete();
         return response(['success' => true, 'data' => null], Response::HTTP_NO_CONTENT);
     }
-
 }

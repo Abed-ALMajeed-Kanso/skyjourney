@@ -9,6 +9,7 @@ use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\SessionController;
 
 Route::post('/login', [SessionController::class, 'login'])->name('login'); 
+Route::post('/register', [SessionController::class, 'register'])->name('register'); 
 
 Route::middleware('auth:sanctum')->group(function () {
     //routes ghalat

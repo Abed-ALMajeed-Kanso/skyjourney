@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait; 
-use Laravel\Sanctum\HasApiTokens;
 
 class Flight extends Model implements Auditable 
 {
-    //la shu aayzinun?
-    use HasFactory, AuditableTrait, HasApiTokens;
+    
+    use HasFactory, AuditableTrait;
 
     protected $guarded = [];
 
