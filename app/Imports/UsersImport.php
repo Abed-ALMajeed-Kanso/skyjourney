@@ -14,8 +14,8 @@ class UsersImport implements ToModel
             'id' => $row[0], 
             'name' => $row[1],
             'email' => $row[2],
-            'created_at' => $row[3] ? \Carbon\Carbon::parse($row[6]) : null, 
-            'updated_at' => $row[4] ? \Carbon\Carbon::parse($row[7]) : null, 
+            'created_at' => $row[3],
+            'updated_at' => $row[4],
         ]);
     }
 }
