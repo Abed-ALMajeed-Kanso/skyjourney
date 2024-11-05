@@ -29,6 +29,7 @@ class FlightController extends Controller
 
     public function show(Flight $flight)
     {
+        $flight = $flight->load('passengers');
         return response(['success' => true, 'data' => $flight], Response::HTTP_OK);
     }  
 

@@ -13,6 +13,7 @@ use App\Imports\UsersImport;
 use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Http\Response;
 use Spatie\Permission\Models\Role;
+use App\Exports\UsersExport;
 
 use Illuminate\Validation\ValidationException;
 
@@ -93,5 +94,15 @@ class UserController extends Controller
         $filePath = storage_path('app/uploads/users.csv');
         $data = Excel::toArray(new UsersImport, $filePath);
         return response(['success' => true, 'data' => $data[0]], Response::HTTP_OK);
+    }
+
+    public function export()
+    {
+        $filePath = 'uploads/users.csv';
+        Excel::store(new UsersExport, $filePath, 'local');
+        return response()->json([
+            'success' => true,
+            'file_path' => storage_path("app/{$filePath}")
+        ], Response::HTTP_OK);
     }
 }

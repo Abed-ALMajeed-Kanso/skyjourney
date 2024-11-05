@@ -36,7 +36,7 @@ class SessionController extends Controller
         if ($user && Hash::check($request->password, $user->password)) {
 
             $user->tokens()->delete();
-            $token = $user->createToken('YourAppName')->plainTextToken;
+            $token = $user->createToken('skyjourney')->plainTextToken;
             $user->token = $token;
             return response([
                 'success' => true,

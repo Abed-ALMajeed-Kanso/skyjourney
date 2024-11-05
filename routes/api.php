@@ -12,7 +12,7 @@ Route::post('/login', [SessionController::class, 'login'])->name('login');
 Route::post('/register', [SessionController::class, 'register'])->name('register'); 
 
 Route::middleware('auth:sanctum')->group(function () {
-    //routes ghalat
+    
     Route::get('/passengers', [PassengerController::class, 'index'])->name('passengers.index'); 
     Route::get('/passengers/{passenger}', [PassengerController::class, 'show'])->name('passengers.show'); 
     Route::get('/flights', [FlightController::class, 'index'])->name('flights.index');
@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/Create_user', [UserController::class, 'store'])->name('users.store');
         Route::put('/Update_user/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/Delete_user/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::get('/export_users', [UserController::class, 'export']);
         Route::get('/import_users', [UserController::class, 'import'])->name('users.import');
 
         Route::post('/Create_passenger', [PassengerController::class, 'store'])->name('passengers.store');
