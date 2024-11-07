@@ -11,24 +11,29 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Traits\HandlesImages;
+use Illuminate\Support\Facades\Cache;
 
+// add data caching in route and middlware for 5 minutes 
 class PassengerController extends Controller
 {
     use HandlesImages;
     public function index(Request $request)
     {
-        $passengers = QueryBuilder::for(Passenger::class)
-            ->allowedFilters([
-                AllowedFilter::exact('id'),
-                AllowedFilter::exact('passenger_id'),
-                'first_name', 
-                'last_name', 
-                'email'
-            ])
-            ->defaultSort('-updated_at')
-            ->allowedSorts(['first_name', 'last_name', 'email', 'created_at', 'updated_at'])
-            ->paginate($request->input('per_page', 10));
-
+        $cacheKey = 'passengers_' . md5(serialize($request->all()));
+        $passengers = Cache::remember($cacheKey, 300, function () use ($request) {
+            return QueryBuilder::for(Passenger::class)
+                ->allowedFilters([
+                    AllowedFilter::exact('id'),
+                    AllowedFilter::exact('passenger_id'),
+                    'first_name', 
+                    'last_name', 
+                    'email'
+                ])
+                ->defaultSort('-updated_at')
+                ->allowedSorts(['first_name', 'last_name', 'email', 'created_at', 'updated_at'])
+                ->paginate($request->input('per_page', 10));
+        });
+    
         return response(['success' => true, 'data' => $passengers], Response::HTTP_OK);
     }
 

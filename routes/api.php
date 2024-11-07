@@ -8,38 +8,27 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\SessionController;
 
-Route::post('/login', [SessionController::class, 'login'])->name('login'); 
-Route::post('/register', [SessionController::class, 'register'])->name('register'); 
+Route::post('/login', [SessionController::class, 'login']);//->middleware('throttle:10,1'); 
+Route::post('/register', [SessionController::class, 'register'])->middleware('throttle:10,1');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', \App\Http\Middleware\PermissionPolicy::class])->group(function () {
     
-    Route::get('/passengers', [PassengerController::class, 'index'])->name('passengers.index'); 
-    Route::get('/passengers/{passenger}', [PassengerController::class, 'show'])->name('passengers.show'); 
-    Route::get('/flights', [FlightController::class, 'index'])->name('flights.index');
-    Route::get('/flights/{flight}', [FlightController::class, 'show'])->name('flights.show');
-    Route::get('/flights_passengers/{flight}', [FlightController::class, 'passengers'])->name('flights.passengers');
+    Route::apiResource('passengers', PassengerController::class)->only(['index', 'show'])->middleware('throttle:10,1');
+    Route::get('flights', [FlightController::class, 'index'])->middleware(['throttle:10,1', 'cache.response']); 
+    Route::get('flights/{flight}', [FlightController::class, 'show'])->middleware('throttle:10,1');
 
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware(['role:admin', 'throttle:10,1'])->group(function () {
 
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
-        Route::get('/Get_user/{user}', [UserController::class, 'show'])->name('users.show');
-        Route::post('/Create_user', [UserController::class, 'store'])->name('users.store');
-        Route::put('/Update_user/{user}', [UserController::class, 'update'])->name('users.update');
-        Route::delete('/Delete_user/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::apiResource('users', UserController::class);
+        Route::apiResource('passengers', PassengerController::class)->only(['store', 'update', 'destroy']);
+        Route::apiResource('flights', FlightController::class)->only(['store', 'update', 'destroy']);
+
         Route::get('/export_users', [UserController::class, 'export']);
-        Route::get('/import_users', [UserController::class, 'import'])->name('users.import');
-
-        Route::post('/Create_passenger', [PassengerController::class, 'store'])->name('passengers.store');
-        Route::put('/Update_passenger/{passenger}', [PassengerController::class, 'update'])->name('passengers.update');
-        Route::delete('/Delete_passenger/{passenger}', [PassengerController::class, 'destroy'])->name('passengers.destroy');
-
-        Route::post('/Create_flight', [FlightController::class, 'store'])->name('flights.store');
-        Route::put('/Update_flight/{flight}', [FlightController::class, 'update'])->name('flights.update');
-        Route::delete('/Delete_flight/{flight}', [FlightController::class, 'destroy'])->name('flights.destroy');
+        Route::get('/import_users', [UserController::class, 'import']);
 
     });
     
-    Route::post('/logout', [SessionController::class, 'logout'])->name('logout'); 
+    Route::post('/logout', [SessionController::class, 'logout']); 
 });
 
 Route::get('/', function () {

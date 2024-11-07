@@ -32,13 +32,7 @@ class FlightController extends Controller
         $flight = $flight->load('passengers');
         return response(['success' => true, 'data' => $flight], Response::HTTP_OK);
     }  
-
-    // public function passengers(Flight $flight)
-    // {
-    //     return response(['success' => true, 'data' => $flight->passengers], Response::HTTP_OK);
-    // }
     
-
     public function store(Request $request) 
     {
         $validatedData = $request->validate([

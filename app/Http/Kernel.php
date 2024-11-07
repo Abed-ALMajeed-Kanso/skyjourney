@@ -41,10 +41,17 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            // \App\Http\Middleware\CacheResponse::class, done only for flights index
+            // \App\Http\Middleware\PermissionPolicy::class, done with sanctuem
+            \App\Http\Middleware\SetLocaleMiddleware::class,
+            \App\Http\Middleware\ContentSecurityPolicy::class,
+            \App\Http\Middleware\HSTS::class,
+            \App\Http\Middleware\SetReferrerPolicy::class,
+            \App\Http\Middleware\PreventContentTypeSniffing::class,
         ],
+
     ];
 
     /**
@@ -70,5 +77,6 @@ class Kernel extends HttpKernel
         'admin' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         'sanitize' => \App\Http\Middleware\SanitizeInput::class,
+        'cache.response' => \App\Http\Middleware\CacheResponse::class,
     ];
 }

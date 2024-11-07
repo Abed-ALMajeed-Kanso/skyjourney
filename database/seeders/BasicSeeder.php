@@ -8,6 +8,10 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+
 
 class BasicSeeder extends Seeder
 {
@@ -16,13 +20,14 @@ class BasicSeeder extends Seeder
         // make sure admin the fisrt admin with api gaurd have id 1 
         // and the first viewer of api gaurd have id 2
 
-        Role::insert([
+         Role::insert([
             ['name' => 'admin', 'guard_name' => 'api', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'viewer', 'guard_name' => 'api', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'admin', 'guard_name' => 'sanctum', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'viewer', 'guard_name' => 'sanctum', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'admin', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'viewer', 'guard_name' => 'web', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+         ]);
 
         Permission::insert([
             ['name' => 'view-users', 'guard_name' => 'api', 'created_at' => now(), 'updated_at' => now()],
@@ -123,10 +128,10 @@ class BasicSeeder extends Seeder
             ],
         ]);
 
-        $adminUser = User::where('email', 'admin@example.com')->first();
+        $adminUser = User::where('email', 'veum.drew@example.org')->first();
         $adminUser->assignRole('admin');
 
-        $viewerUser = User::where('email', 'viewer@example.com')->first();
+        $viewerUser = User::where('email', 'clueilwitz@example.net')->first();
         $viewerUser->assignRole('viewer');
     }
 }
