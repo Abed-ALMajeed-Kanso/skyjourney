@@ -45,7 +45,6 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             // \App\Http\Middleware\CacheResponse::class, done only for flights index
             // \App\Http\Middleware\PermissionPolicy::class, done with sanctuem
-            \App\Http\Middleware\SetLocaleMiddleware::class,
             \App\Http\Middleware\ContentSecurityPolicy::class,
             \App\Http\Middleware\HSTS::class,
             \App\Http\Middleware\SetReferrerPolicy::class,

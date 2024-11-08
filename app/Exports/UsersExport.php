@@ -10,17 +10,18 @@ class UsersExport implements FromCollection, WithHeadings
 {
     public function collection()
     {
-        return User::all(['id', 'name', 'email', 'created_at', 'updated_at']);
+        return User::all(['id', 'name', 'email', 'password', 'created_at', 'updated_at']);
     }
 
     public function headings(): array
     {
         return [
-            'ID',
-            'Name',
-            'Email',
-            'Created At',
-            'Updated At',
+            'ID',                     
+            'Name',                   
+            'Email',                
+            'Password',               
+            'Created At',             
+            'Updated At',             
         ];
     }
 }
