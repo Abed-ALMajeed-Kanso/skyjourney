@@ -13,7 +13,6 @@ use Intervention\Image\Facades\Image;
 use App\Traits\HandlesImages;
 use Illuminate\Support\Facades\Cache;
 
-// add data caching in route and middlware for 5 minutes 
 class PassengerController extends Controller
 {
     use HandlesImages;

@@ -8,7 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\SessionController;
 
-Route::post('/login', [SessionController::class, 'login']);//->middleware('throttle:10,1'); 
+Route::post('/login', [SessionController::class, 'login'])->middleware('throttle:10,1'); 
 Route::post('/register', [SessionController::class, 'register'])->middleware('throttle:10,1');
 
 Route::middleware(['auth:sanctum', \App\Http\Middleware\PermissionPolicy::class])->group(function () {

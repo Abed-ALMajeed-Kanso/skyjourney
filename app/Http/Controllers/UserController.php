@@ -15,8 +15,6 @@ use Illuminate\Http\Response;
 use Spatie\Permission\Models\Role;
 use App\Exports\UsersExport;
 
-use Illuminate\Validation\ValidationException;
-
 class UserController extends Controller
 {
     public function index(Request $request)
